@@ -6,7 +6,7 @@
   <br>
 </h1>
 
-<h4 align="center">Professional AI-powered roulette prediction system — Deep LSTM neural networks, real-time casino feed, beautiful terminal UI.</h4>
+<h4 align="center">Deep LSTM neural network that learns from live roulette spin history, predicts the next most-likely numbers, and tracks your edge — works with any live or online roulette table.</h4>
 
 <p align="center">
   <a href="https://github.com/alaevate/deeproulette/issues">
@@ -103,7 +103,7 @@ DeepRoulette/
 │   └── trainer.py         ← Model training (offline & online)
 │
 ├── data/
-│   ├── live_feed.py       ← Live WebSocket connection to casino
+│   ├── live_feed.py       ← Live WebSocket feed (Pragmatic Play / configurable)
 │   └── simulator.py       ← Local random spin generator
 │
 ├── models/
@@ -135,7 +135,7 @@ DeepRoulette/
 ## 🧠 How It Works
 
 ```
-  Roulette Table
+  Roulette Table  (live, online, or manual entry)
        │  (spin result every ~30 seconds)
        ▼
   Live Feed / Simulator
