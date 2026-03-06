@@ -6,7 +6,7 @@
   <br>
 </h1>
 
-<h4 align="center">Deep LSTM neural network that learns from live roulette spin history, predicts the next most-likely numbers, and tracks your edge — works with any live or online roulette table.</h4>
+<h4 align="center">LSTM-powered roulette predictor — real-time learning, 5 betting strategies, works with any table.</h4>
 
 <p align="center">
   <a href="https://github.com/alaevate/deeproulette/issues">
