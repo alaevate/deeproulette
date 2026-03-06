@@ -1,11 +1,3 @@
-<p align="center">
-  <a href="#disclaimer">⚠️ Disclaimer</a> •
-  <a href="#quick-start--no-tech-knowledge-needed">🚀 Quick Start</a> •
-  <a href="#strategies">📊 Strategies</a> •
-  <a href="#project-structure">📁 Structure</a> •
-  <a href="#how-it-works">🧠 How It Works</a> •
-  <a href="#advanced-settings">⚙️ Settings</a>
-</p>
 <h4 align="center">LSTM-powered roulette predictor — real-time learning, 5 betting strategies, works with any table.</h4>
 
 <p align="center">
@@ -24,12 +16,12 @@
 </p>
 
 <p align="center">
-  <a href="## ⚠️ Disclaimer">⚠️ Disclaimer</a> •
-  <a href="#-quick-start-no-tech-knowledge-needed">🚀 Quick Start</a> •
-  <a href="#-strategies">📊 Strategies</a> •
-  <a href="#-project-structure">📁 Structure</a> •
-  <a href="#-how-it-works">🧠 How It Works</a> •
-  <a href="##-⚙️-Advanced-Settings">⚙️ Settings</a>
+  <a href="#disclaimer">⚠️ Disclaimer</a> •
+  <a href="#quick-start--no-tech-knowledge-needed">🚀 Quick Start</a> •
+  <a href="#strategies">📊 Strategies</a> •
+  <a href="#project-structure">📁 Structure</a> •
+  <a href="#how-it-works">🧠 How It Works</a> •
+  <a href="#advanced-settings">⚙️ Settings</a>
 </p>
 
 <p align="center">
