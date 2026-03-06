@@ -1,3 +1,11 @@
+<h1 align="center">
+  <br>
+  <a href="https://github.com/alaevate/deeproulette"><img src="assets/logo.svg" alt="DeepRoulette" width="200"></a>
+  <br>
+  DeepRoulette
+  <br>
+</h1>
+
 <h4 align="center">LSTM-powered roulette predictor — real-time learning, 5 betting strategies, works with any table.</h4>
 
 <p align="center">
@@ -16,12 +24,12 @@
 </p>
 
 <p align="center">
-  <a href="#disclaimer">⚠️ Disclaimer</a> •
-  <a href="#quick-start--no-tech-knowledge-needed">🚀 Quick Start</a> •
-  <a href="#strategies">📊 Strategies</a> •
-  <a href="#project-structure">📁 Structure</a> •
-  <a href="#how-it-works">🧠 How It Works</a> •
-  <a href="#advanced-settings">⚙️ Settings</a>
+  <a href="## ⚠️ Disclaimer">⚠️ Disclaimer</a> •
+  <a href="#-quick-start-no-tech-knowledge-needed">🚀 Quick Start</a> •
+  <a href="#-strategies">📊 Strategies</a> •
+  <a href="#-project-structure">📁 Structure</a> •
+  <a href="#-how-it-works">🧠 How It Works</a> •
+  <a href="##-⚙️-Advanced-Settings">⚙️ Settings</a>
 </p>
 
 <p align="center">
