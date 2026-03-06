@@ -6,9 +6,13 @@ __pycache__/
 .Python
 env/
 venv/
+.venv/
 ENV/
 env.bak/
 venv.bak/
+
+# Data storage
+data_store/
 
 # Machine Learning Models
 *.keras
@@ -34,3 +38,8 @@ Thumbs.db
 roulette_log.txt
 *.backup
 temp/
+
+# PyInstaller build output
+build/
+dist/
+*.spec.bak

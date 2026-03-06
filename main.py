@@ -1,178 +1,118 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
-NeuralRoulette-AI Main Entry Point
-Unified execution script for all roulette prediction strategies
+DeepRoulette
+============
+Professional AI-powered roulette prediction system.
 
-Usage:
-    python main.py --strategy top1
-    python main.py --strategy top3 --balance 50.0
-    python main.py --strategy top18 --auto-train
-    python main.py --list-strategies
+How to run
+----------
+  Windows  ->  Double-click  START.bat
+  Terminal ->  python main.py
+
+First time?  Run  SETUP.bat  first to install all dependencies.
 """
 
-import argparse
-import asyncio
 import sys
 import os
-import logging
-from pathlib import Path
 
-# Add current directory to path for imports
+# Suppress TensorFlow's verbose CPU/GPU info messages before any TF import
+os.environ["TF_CPP_MIN_LOG_LEVEL"]      = "3"   # 0=all, 1=info, 2=warning, 3=error only
+os.environ["TF_ENABLE_ONEDNN_OPTS"]     = "0"   # silence oneDNN optimizer notices
+os.environ["CUDA_VISIBLE_DEVICES"]      = ""    # suppress GPU detection noise if no GPU
+
+# Ensure the project root is always on the Python path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from config.settings import STRATEGIES, WS_URL, CASINO_ID, TABLE_ID, CURRENCY
-from src.data.websocket_client import RouletteWebSocketClient
-from src.strategies.strategy_manager import StrategyManager
+# -- Dependency check (friendly error for non-tech users) ---------------------
+try:
+    from rich.console import Console
+except ImportError:
+    print()
+    print("  ERROR: Required packages are not installed.")
+    print()
+    print("  Please run  SETUP.bat  first (Windows)")
+    print("  or run:  pip install -r requirements.txt")
+    print()
+    input("  Press Enter to exit...")
+    sys.exit(1)
 
-def parse_arguments():
-    """Parse command line arguments"""
-    parser = argparse.ArgumentParser(
-        description="NeuralRoulette-AI: Advanced AI Roulette Prediction System",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-Examples:
-  python main.py --strategy top1                    # Run top-1 strategy
-  python main.py --strategy top3 --balance 100    # Run with $100 balance
-  python main.py --strategy top18 --auto-train    # Auto-train on new data
-  python main.py --list-strategies                # Show available strategies
-        """
-    )
-    
-    parser.add_argument(
-        '--strategy',
-        choices=['top1', 'top3', 'top18', 'topm'],
-        default='top1',
-        help='Prediction strategy to use (default: top1)'
-    )
-    
-    parser.add_argument(
-        '--balance',
-        type=float,
-        default=10.0,
-        help='Starting balance for simulation (default: 10.0)'
-    )
-    
-    parser.add_argument(
-        '--auto-train',
-        action='store_true',
-        help='Enable automatic model training on new data'
-    )
-    
-    parser.add_argument(
-        '--list-strategies',
-        action='store_true',
-        help='List available strategies and exit'
-    )
-    
-    parser.add_argument(
-        '--simulate',
-        action='store_true',
-        help='Use simulated data instead of live WebSocket connection'
-    )
-    
-    return parser.parse_args()
+import asyncio
 
-def list_strategies():
-    """List all available strategies"""
-    print("\n🎰 NeuralRoulette-AI Available Strategies")
-    print("=" * 50)
-    
-    for key, config in STRATEGIES.items():
-        print(f"\n{key.upper()} - {config.name}")
-        print(f"  Description: {config.description}")
-        print(f"  Risk Level: {config.risk_level}")
-        print(f"  Numbers to Predict: {config.numbers_to_predict}")
-        print(f"  Target Win Rate: {config.target_win_rate}%")
-        print(f"  Model File: {config.model_file}")
-    
-    print("\n" + "=" * 50)
+from ui.menu    import run_menu, console
+from ui.display import (
+    render_spin,
+    render_waiting,
+    render_session_header,
+    render_balance_empty,
+    render_session_summary,
+    render_bet_advice,
+)
+from core.engine     import PredictionEngine
+from config.settings import SAVED_MODELS_DIR, OFFLINE_MODELS_DIR, ONLINE_MODELS_DIR, LOGS_DIR, DATA_STORE_DIR
 
-def setup_logging():
-    """Set up logging configuration"""
-    # Create logs directory if it doesn't exist
-    os.makedirs("logs", exist_ok=True)
-    
-    # Configure logging
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(message)s",
-        handlers=[
-            logging.FileHandler("logs/roulette.log"),
-            logging.StreamHandler()
-        ]
+
+# -- Folder setup --------------------------------------------------------------
+
+def ensure_directories():
+    """Create required directories if they don't exist yet."""
+    for directory in [SAVED_MODELS_DIR, OFFLINE_MODELS_DIR, ONLINE_MODELS_DIR, LOGS_DIR, DATA_STORE_DIR]:
+        os.makedirs(directory, exist_ok=True)
+
+
+# -- Session runner ------------------------------------------------------------
+
+async def run_session(config: dict):
+    """Initialise the engine and run until Ctrl+C or balance depleted."""
+    strategy = config["strategy_cls"]()
+    balance  = config["balance"]
+
+    engine = PredictionEngine(
+        strategy        = strategy,
+        initial_balance = balance,
+        auto_train      = config["auto_train"],
+        use_live        = config["use_live"],
+        spin_interval   = config.get("spin_interval", 5.0),
+        manual_mode     = config.get("manual_mode", False),
     )
 
-async def run_strategy(strategy_name, balance, auto_train, simulate=False):
-    """Run the selected strategy with WebSocket data"""
-    # Create strategy manager
-    strategy_manager = StrategyManager(strategy_name, balance, auto_train)
-    if not await strategy_manager.load_strategy():
-        print(f"❌ Failed to load strategy: {strategy_name}")
-        return
-    
-    # Create WebSocket client
-    ws_client = RouletteWebSocketClient(WS_URL, CASINO_ID, TABLE_ID, CURRENCY)
-    
-    # Register callback to process new numbers
-    ws_client.register_callback(strategy_manager.process_number)
-    
+    # Wire up UI callbacks
+    engine.on_spin_complete = render_spin
+    engine.on_waiting       = render_waiting
+    engine.on_balance_empty = render_balance_empty
+    engine.on_advice        = render_bet_advice
+
+    # Print session header
+    render_session_header(strategy, balance, config["use_live"], config["auto_train"], config.get("manual_mode", False))
+
     try:
-        if simulate:
-            print("🔄 Using simulated roulette data")
-            await ws_client.simulate_data()
-        else:
-            # Connect to WebSocket
-            if await ws_client.connect():
-                print("✅ Connected to roulette WebSocket")
-                await ws_client.listen()
-            else:
-                print("❌ Failed to connect to WebSocket")
-                print("🔄 Falling back to simulation mode")
-                await ws_client.simulate_data()
-    except Exception as e:
-        print(f"❌ Error: {str(e)}")
+        await engine.run()
+    except (asyncio.CancelledError, KeyboardInterrupt):
+        pass
     finally:
-        if not simulate:
-            await ws_client.disconnect()
+        # Always print the summary, even on Ctrl+C
+        render_session_summary(engine.tracker, strategy, balance)
 
-async def async_main():
-    """Async main function"""
-    args = parse_arguments()
-    
-    if args.list_strategies:
-        list_strategies()
-        return
-    
-    # Create models directory if it doesn't exist
-    os.makedirs("models", exist_ok=True)
-    
-    print(f"\n🚀 Starting NeuralRoulette-AI with {args.strategy} strategy")
-    print(f"💰 Initial balance: ${args.balance}")
-    print(f"🤖 Auto-training: {'Enabled' if args.auto_train else 'Disabled'}")
-    print(f"🔄 Data source: {'Simulation' if args.simulate else 'Live WebSocket'}")
-    
-    # Show the configuration
-    config = STRATEGIES[args.strategy]
-    print(f"\n📊 Strategy Configuration:")
-    print(f"  Name: {config.name}")
-    print(f"  Description: {config.description}")
-    print(f"  Risk Level: {config.risk_level}")
-    print(f"  Target Win Rate: {config.target_win_rate}%")
-    
-    # Run the strategy
-    await run_strategy(args.strategy, args.balance, args.auto_train, args.simulate)
+
+# -- Entry point ---------------------------------------------------------------
 
 def main():
-    """Main application entry point"""
-    # Set up logging
-    setup_logging()
-    
-    # Run the async main function
-    asyncio.run(async_main())
+    ensure_directories()
+
+    # Run the interactive menu
+    try:
+        config = run_menu()
+    except KeyboardInterrupt:
+        console.print("\n[bold yellow]  Goodbye! [/bold yellow]\n")
+        return
+
+    # Run the prediction session
+    try:
+        asyncio.run(run_session(config))
+    except KeyboardInterrupt:
+        pass   # summary already printed inside run_session's finally block
+
+    console.print("[bold yellow]  Thanks for using DeepRoulette![/bold yellow]\n")
+
 
 if __name__ == "__main__":
-    try:
-        main()
-    except KeyboardInterrupt:
-        print("\n\n👋 Graceful shutdown initiated...")
-        print("Thank you for using NeuralRoulette-AI!")
+    main()

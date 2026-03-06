@@ -1,243 +1,202 @@
 <h1 align="center">
   <br>
-  <a href="https://github.com/dredyne/NeuralRoulette-AI"><img src="assets/logo.svg" alt="NeuralRoulette AI" width="200"></a>
+  <a href="https://github.com/alaevate/deeproulette"><img src="assets/logo.svg" alt="DeepRoulette" width="200"></a>
   <br>
-  NeuralRoulette AI
+  DeepRoulette
   <br>
 </h1>
 
-<h4 align="center">An advanced machine learning system for predicting roulette outcomes using LSTM</a>.</h4>
+<h4 align="center">Professional AI-powered roulette prediction system — Deep LSTM neural networks, real-time casino feed, beautiful terminal UI.</h4>
 
 <p align="center">
-  <a href="https://github.com/dredyne/NeuralRoulette-AI/issues">
-    <img alt="GitHub Issues" src="https://img.shields.io/github/issues/dredyne/NeuralRoulette-AI?style=plastic">
-  </a>  
-  <a href="https://github.com/dredyne/NeuralRoulette-AI/pulls">
-    <img alt="GitHub Pull Requests" src="https://img.shields.io/github/issues-pr/dredyne/NeuralRoulette-AI?style=plastic">
+  <a href="https://github.com/alaevate/deeproulette/issues">
+    <img alt="GitHub Issues" src="https://img.shields.io/github/issues/alaevate/deeproulette?style=plastic">
+  </a>
+  <a href="https://github.com/alaevate/deeproulette/pulls">
+    <img alt="GitHub Pull Requests" src="https://img.shields.io/github/issues-pr/alaevate/deeproulette?style=plastic">
   </a>
   <a href="https://discord.gg/UPyggZ2cK8">
     <img alt="Discord" src="https://img.shields.io/discord/827945236218904627?style=plastic&label=discord">
   </a>
-  <a href="https://github.com/dredyne/NeuralRoulette-AI/graphs/contributors">
-    <img alt="GitHub contributors" src="https://img.shields.io/github/contributors/dredyne/NeuralRoulette-AI?style=plastic">
-  </a>
-  <a href="https://github.com/sponsors/dredyne">
-    <img alt="GitHub Sponsors" src="https://img.shields.io/github/sponsors/dredyne?style=plastic">
+  <a href="https://github.com/alaevate/deeproulette/graphs/contributors">
+    <img alt="GitHub contributors" src="https://img.shields.io/github/contributors/alaevate/deeproulette?style=plastic">
   </a>
 </p>
 
 <p align="center">
-  <a href="#-project-overview">Project Overview</a> •
-  <a href="#-quick-start">Quick Start</a> •
-  <a href="#-configuration">Configuration</a> •
-  <a href="#-usage-examples">Usage Examples</a> •
-  <a href="#-contributing">Contributing</a> •
-  <a href="#-license">License</a>
+  <a href="#-disclaimer">⚠️ Disclaimer</a> •
+  <a href="#-quick-start-no-tech-knowledge-needed">🚀 Quick Start</a> •
+  <a href="#-strategies">📊 Strategies</a> •
+  <a href="#-project-structure">📁 Structure</a> •
+  <a href="#-how-it-works">🧠 How It Works</a> •
+  <a href="#%EF%B8%8F-advanced-settings">⚙️ Settings</a>
 </p>
 
 <p align="center">
-  <img src="assets/image.png" alt="NeuralRoulette AI Demo">
+  <img src="assets/image.png" alt="DeepRoulette Demo">
 </p>
+
+---
 
 ## ⚠️ Disclaimer
 
-**Important**: This system is for educational and entertainment purposes only. Roulette is a game of chance with inherent house edge. No prediction system can guarantee wins. Always gamble responsibly and within your means.
+> **This software is for educational and research purposes only.**
+> Roulette is a game of pure chance. The house always has an edge.
+> No AI system can guarantee wins. Never gamble with money you cannot afford to lose.
+> Always gamble responsibly.
 
-## 🎯 Project Overview
+---
 
-NeuralRoulette-AI is a sophisticated roulette prediction system that leverages deep learning to analyze historical roulette spin data and predict future outcomes. The system uses multiple prediction strategies with varying risk levels to provide comprehensive betting insights.
+## 🚀 Quick Start — No Tech Knowledge Needed
 
-### Key Features
-- **Real-time Data**: Live WebSocket connection to Pragmatic Play Live Casino
-- **Multiple Prediction Models**: Top-1, Top-3, Top-18 number predictions
-- **LSTM Neural Networks**: Advanced sequence learning for pattern recognition
-- **Betting Simulation**: Track win rates and balance changes
-- **Model Persistence**: Save and load trained models for continuous learning
-- **Comprehensive Logging**: Detailed session tracking and performance metrics
+### Step 1 — Install Python (one-time, skip if already installed)
 
-## 🧠 Technical Architecture
+1. Go to **https://www.python.org/downloads/**
+2. Download the latest Python 3 installer
+3. Run it and **tick the box** that says **"Add Python to PATH"**
+4. Click Install
 
-### Machine Learning Pipeline
-1. **Data Collection**: Real-time roulette spin results via WebSocket
-2. **Preprocessing**: Sequence generation and normalization
-3. **Model Training**: LSTM networks with dropout regularization
-4. **Prediction**: Multi-class classification for roulette outcomes
-5. **Evaluation**: Win rate calculation and performance tracking
+### Step 2 — Set up the project (one-time)
 
-### Model Specifications
-- **Architecture**: LSTM with 128→64→Dense layers
-- **Sequence Length**: 10-18 historical spins
-- **Output Classes**: 37 (0-36) for numbers
-- **Training**: 50 epochs with Adam optimizer
-- **Regularization**: 20% dropout to prevent overfitting
+Double-click **`SETUP.bat`** in the project folder.
+It will automatically install everything the program needs.
+
+### Step 3 — Run the program
+
+Double-click **`START.bat`**.
+
+That's it! An interactive menu will guide you through everything — no typing of commands needed.
+
+---
+
+## 📊 Strategies
+
+Choose a strategy in the interactive menu. Each one tells the AI how many numbers to bet on per spin:
+
+| Strategy | Numbers Bet | Win Chance | Risk | Best For |
+|---|---|---|---|---|
+| 🎯 **Sniper** | 1 | ~2.7% | Extreme | Thrill seekers — huge payouts, rare wins |
+| 🔥 **Aggressive** | 3 | ~8.1% | High | Confident sessions with strong AI training |
+| ⚖️ **Balanced** | 6 | ~16.2% | Medium | **Recommended starting point** |
+| 🛡️ **Conservative** | 18 | ~48.6% | Low | Beginners — most consistent results |
+| 🤖 **Adaptive AI** | 1–18 | Varies | Variable | Let the AI decide based on its own confidence |
+
+> **Not sure which to pick?** Start with **Balanced** or **Conservative**.
+
+---
 
 ## 📁 Project Structure
 
 ```
-NeuralRoulette-AI/
-├── README.md                    # This documentation file
-├── requirements.txt             # Python dependencies
-├── .gitignore                   # Git ignore rules
-├── main.py                      # Unified execution script for all strategies
-├── config/                      # Configuration files
-│   └── settings.py              # Centralized configuration management
-├── src/                         # Source code
-│   ├── strategies/              # Betting strategies
-│   ├── data/                    # WebSocket data handling
-│   └── utils/                   # Logging & utilities
-└── models/                      # Trained model files
+DeepRoulette/
+│
+├── START.bat              ← Double-click to run the program
+├── SETUP.bat              ← Double-click ONCE to install everything
+├── main.py                ← Program entry point
+├── requirements.txt       ← Package list (used by SETUP.bat)
+│
+├── config/
+│   └── settings.py        ← All tunable settings in one place
+│
+├── core/
+│   ├── engine.py          ← Main prediction loop
+│   └── trainer.py         ← Model training (offline & online)
+│
+├── data/
+│   ├── live_feed.py       ← Live WebSocket connection to casino
+│   └── simulator.py       ← Local random spin generator
+│
+├── models/
+│   └── neural_network.py  ← LSTM architecture definition
+│
+├── strategies/
+│   ├── base.py            ← Shared betting logic
+│   ├── sniper.py          ← 1 number
+│   ├── aggressive.py      ← 3 numbers
+│   ├── balanced.py        ← 6 numbers
+│   ├── conservative.py    ← 18 numbers
+│   └── adaptive.py        ← AI-driven dynamic
+│
+├── ui/
+│   ├── menu.py            ← Interactive startup menu
+│   └── display.py         ← Colourful terminal output
+│
+├── utils/
+│   ├── logger.py          ← Session log files
+│   └── tracker.py         ← Win/loss statistics
+│
+├── saved_models/          ← AI model files saved here (.keras)
+├── logs/                  ← Session log files saved here
+└── data_store/            ← Reserved for future data storage
 ```
-
-## 🚀 Quick Start
-
-### Prerequisites
-- Python 3.8+
-- TensorFlow 2.x
-- WebSocket support
-
-### Installation
-
-1. **Clone the repository**
-```bash
-git clone https://github.com/dredyne/NeuralRoulette-AI.git
-cd NeuralRoulette-AI
-```
-
-2. **Install dependencies**
-```bash
-pip install -r requirements.txt
-```
-
-3. **Run the prediction system**
-```bash
-# List all available strategies
-python main.py --list-strategies
-
-# Run specific strategy
-python main.py --strategy top1 --balance 100
-python main.py --strategy top3 --balance 50
-python main.py --strategy top18 --auto-train
-```
-
-### Requirements
-```bash
-tensorflow>=2.8.0
-numpy>=1.21.0
-websockets>=10.0
-```
-
-## 📊 Prediction Strategies
-
-### 1. Top-1 Prediction
-- **Strategy**: Predicts the single most likely number
-- **Risk Level**: Very High
-- **Payout**: 35:1
-- **Break-even Win Rate**: >2.70%
-- **Use Case**: High-risk, high-reward betting
-
-### 2. Top-3 Prediction
-- **Strategy**: Predicts the 3 most likely numbers
-- **Risk Level**: High
-- **Payout**: 35:1 per hit
-- **Break-even Win Rate**: >8.57%
-- **Use Case**: Balanced risk/reward approach
-
-### 3. Top-18 Prediction
-- **Strategy**: Predicts the 18 most likely numbers
-- **Risk Level**: Medium
-- **Payout**: 35:1 per hit
-- **Break-even Win Rate**: >51.43%
-- **Use Case**: Conservative betting strategy
-
-## 🔧 Configuration
-
-### WebSocket Settings
-- **URL**: `wss://dga.pragmaticplaylive.net/ws`
-- **Casino ID**: `ppcds00000003709`
-- **Table**: `236` (Pragmatic Play Live Roulette)
-
-### Model Parameters
-- **Sequence Length**: 10-18 historical spins
-- **Memory Limit**: 1000 recent spins
-- **Training Frequency**: Every new spin
-- **Batch Size**: 32
-- **Epochs**: 50
-
-## 📈 Performance Metrics
-
-### Key Performance Indicators
-- **Win Rate**: Percentage of correct predictions
-- **Balance**: Simulated betting balance
-- **ROI**: Return on investment over time
-- **Accuracy**: Model prediction accuracy
-
-### Logging
-All sessions are logged with:
-- Session timestamps
-- Total spins
-- Win rates
-- Final balances
-
-## 🎮 Usage Examples
-
-### Basic Usage
-```bash
-# List all strategies
-python main.py --list-strategies
-
-# Run specific strategy
-python main.py --strategy top1 --balance 100
-
-# Run with automatic training
-python main.py --strategy top18 --auto-train
-
-# Use simulated data instead of live WebSocket
-python main.py --strategy top3 --balance 50 --simulate
-```
-
-### Output Example
-```
-🎰 NeuralRoulette-AI Available Strategies
-==================================================
-
-TOP1 - Top-1 Single Number
-  Description: Highest risk/reward - predicts single most likely number
-  Risk Level: High
-  Numbers to Predict: 1
-  Target Win Rate: 2.71%
-  Model File: top1_model.keras
-
-TOP3 - Top-3 Numbers
-  Description: Medium risk - predicts top 3 most likely numbers
-  Risk Level: Medium
-  Numbers to Predict: 3
-  Target Win Rate: 8.11%
-  Model File: top3_model.keras
-
-TOP18 - Top-18 Numbers
-  Description: Lower risk - covers half the wheel
-  Risk Level: Low
-  Numbers to Predict: 18
-  Target Win Rate: 48.65%
-  Model File: top18_model.keras
-```
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit issues, feature requests, or pull requests.
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- Pragmatic Play for providing live roulette data
-- TensorFlow team for the excellent ML framework
-- WebSocket community for real-time communication tools
 
 ---
 
-<div align="center"><sub>
+## 🧠 How It Works
 
-Built with ❤️ by [dredyne](https://github.com/dredyne)</sub></div>
+```
+  Roulette Table
+       │  (spin result every ~30 seconds)
+       ▼
+  Live Feed / Simulator
+       │  (integer 0–36)
+       ▼
+  Prediction Engine
+       │
+       ├── [History buffer]  Collects the last 15 spin results
+       │
+       ├── [Neural Network]  3-layer LSTM → outputs a probability
+       │                     for each of the 37 possible numbers
+       │
+       ├── [Strategy]        Picks the top N numbers by probability
+       │
+       ├── [Betting]         Sizes bets as 2% of balance per number
+       │
+       ├── [Accounting]      Win: +35× the winning bet − all bets
+       │                     Loss: −all bets
+       │
+       ├── [Statistics]      Updates win rate, ROI, streak
+       │
+       └── [Auto-train]      (if enabled) Re-trains the model on
+                             recent history — model improves over time
+```
+
+### The AI Model
+
+- **Architecture**: 3 stacked LSTM layers (256 → 128 → 64 units), followed by 2 Dense layers
+- **Input**: The last 15 spin results, normalised to [0, 1]
+- **Output**: A probability distribution over all 37 numbers (0–36)
+- **Training**: Categorical cross-entropy loss, Adam optimiser, early stopping
+- **Online learning**: Optional — the model updates after every spin using the most recent 150 results
+
+---
+
+## ⚙️ Advanced Settings
+
+All settings are in [`config/settings.py`](config/settings.py). Key values:
+
+| Setting | Default | What it controls |
+|---|---|---|
+| `SEQUENCE_LENGTH` | `15` | Past spins used as AI input |
+| `BET_FRACTION` | `0.02` | Fraction of balance bet per number |
+| `AUTO_TRAIN_MIN` | `30` | Min spins before online training starts |
+| `SPIN_INTERVAL` | `5` | Seconds between simulated spins |
+| `RECONNECT_DELAY` | `30` | Seconds before WebSocket reconnect |
+| `TRAINING_EPOCHS` | `100` | Epochs for full offline training |
+
+---
+
+## 🤝 Contributing
+
+Pull requests and issues are welcome!
+
+---
+
+## 📄 License
+
+MIT License — see [LICENSE](LICENSE)
+
+---
+
+<div align="center"><sub>Built with ❤️ by <a href="https://github.com/alaevate">alaevate</a></sub></div>
+

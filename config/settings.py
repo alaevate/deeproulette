@@ -1,86 +1,71 @@
 """
-NeuralRoulette-AI Configuration Settings
-Central configuration management for all strategies and system parameters
+DeepRoulette — Central Configuration
+==========================================
+All settings live here. Change values to customize the system.
 """
 
-import os
-from dataclasses import dataclass
-from typing import Dict, Any
+# ── Casino WebSocket Connection ───────────────────────────────────────────────
+CASINO_WS_URL = "wss://dga.pragmaticplaylive.net/ws"
+CASINO_ID     = "ppcds00000003709"
+TABLE_ID      = "236"
+CURRENCY      = "USD"
 
-# WebSocket Configuration
-WS_URL = "wss://dga.pragmaticplaylive.net/ws"
-CASINO_ID = "ppcds00000003709"
-TABLE_ID = "236"
-CURRENCY = "USD"
+# ── Neural Network Architecture ───────────────────────────────────────────────
+SEQUENCE_LENGTH  = 15      # How many past spins the AI uses as input
+ROULETTE_NUMBERS = 37      # Possible outcomes: 0 through 36
 
-# Model Configuration
-MODEL_DIR = "models"
-SEQUENCE_LENGTH = 10
-ROULETTE_RANGE = 37
-EPOCHS = 50
-BATCH_SIZE = 32
+LSTM_UNITS_1  = 256        # First LSTM layer size  (bigger = smarter but slower)
+LSTM_UNITS_2  = 128        # Second LSTM layer size
+LSTM_UNITS_3  = 64         # Third LSTM layer size
+DENSE_UNITS   = 128        # Fully-connected hidden layer
+DROPOUT_RATE  = 0.25       # Regularization — prevents the model from memorizing noise
+LEARNING_RATE = 0.001      # How fast the model adjusts its weights
 
-# Betting Configuration
-STARTING_BALANCE = 10.00
-MIN_BET_AMOUNT = 0.01
-PAYOUT_RATIO = 35
+# ── Training ──────────────────────────────────────────────────────────────────
+BATCH_SIZE        = 32     # Samples per training step
+TRAINING_EPOCHS   = 100    # Max epochs for a full offline training run
+ONLINE_EPOCHS     = 3      # Epochs used for per-spin online updates
+AUTO_TRAIN_MIN    = 30     # Minimum spins collected before online training begins
+AUTO_SAVE_EVERY   = 50     # Persist model to disk every N online updates
 
-@dataclass
-class StrategyConfig:
-    """Configuration for each betting strategy"""
-    name: str
-    model_file: str
-    description: str
-    risk_level: str
-    numbers_to_predict: int
-    bet_multiplier: float
-    target_win_rate: float
+# ── Betting ───────────────────────────────────────────────────────────────────
+DEFAULT_BALANCE = 100.0    # Default starting wallet
+MIN_BET         = 0.10     # Minimum bet per number
+BET_FRACTION    = 0.02     # Fraction of balance wagered per number each spin
+PAYOUT_RATIO    = 35       # Standard straight-up roulette payout (35 : 1)
 
-# Strategy configurations
-STRATEGIES = {
-    "top1": StrategyConfig(
-        name="Top-1 Single Number",
-        model_file="top1_model.keras",
-        description="Highest risk/reward - predicts single most likely number",
-        risk_level="High",
-        numbers_to_predict=1,
-        bet_multiplier=1.0,
-        target_win_rate=2.71
-    ),
-    "top3": StrategyConfig(
-        name="Top-3 Numbers",
-        model_file="top3_model.keras",
-        description="Medium risk - predicts top 3 most likely numbers",
-        risk_level="Medium",
-        numbers_to_predict=3,
-        bet_multiplier=0.33,
-        target_win_rate=8.11
-    ),
-    "top18": StrategyConfig(
-        name="Top-18 Numbers",
-        model_file="top18_model.keras",
-        description="Lower risk - covers half the wheel",
-        risk_level="Low",
-        numbers_to_predict=18,
-        bet_multiplier=0.055,
-        target_win_rate=48.65
-    ),
-    "topm": StrategyConfig(
-        name="Top-M Dynamic",
-        model_file="topm_model.keras",
-        description="Adaptive strategy based on confidence levels",
-        risk_level="Variable",
-        numbers_to_predict=0,  # Dynamic
-        bet_multiplier=0.0,    # Dynamic
-        target_win_rate=0.0    # Dynamic
-    )
-}
+# ── File Paths ────────────────────────────────────────────────────────────────
+SAVED_MODELS_DIR        = "saved_models"          # Root models directory
+OFFLINE_MODELS_DIR      = "saved_models/offline"  # Models trained offline (full dataset)
+ONLINE_MODELS_DIR       = "saved_models/online"   # Models updated online (per-spin incremental)
+LOGS_DIR                = "logs"                  # Where session logs are written
+DATA_STORE_DIR          = "data_store"             # Reserved for future dataset storage
 
-# Logging Configuration
-LOG_LEVEL = "INFO"
-LOG_FORMAT = "%(asctime)s - %(levelname)s - %(message)s"
-LOG_FILE = "logs/neuralroulette.log"
+# ── System ────────────────────────────────────────────────────────────────────
+MAX_HISTORY      = 2000    # Max spins kept in memory (sliding window)
+RECONNECT_DELAY  = 30      # Seconds to wait before WebSocket reconnect
+PING_INTERVAL    = 60      # Seconds between keepalive pings to the server
+SPIN_INTERVAL    = 5       # Seconds between spins in simulation mode (default)
 
-# Performance Tracking
-MAX_HISTORY_LENGTH = 1000
-SAVE_INTERVAL = 100  # Save model every 100 spins
+# ── Simulation Speed Presets ──────────────────────────────────────────────────
+# Each entry: (label, description, spin_interval_seconds)
+SPEED_PRESETS = [
+    ("Normal",   "1 spin every 5 seconds  (realistic)",   5.0),
+    ("Fast",     "1 spin every 2 seconds",                2.0),
+    ("Turbo",    "1 spin every 0.5 seconds",              0.5),
+    ("Max",      "No delay — as fast as possible",        0.0),
+]
+
+# ── Roulette Number Colors ────────────────────────────────────────────────────
+RED_NUMBERS   = {1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36}
+BLACK_NUMBERS = {2, 4, 6, 8, 10, 11, 13, 15, 17, 20, 22, 24, 26, 28, 29, 31, 33, 35}
+
+
+def get_number_color(n: int) -> str:
+    """Return 'red', 'black', or 'green' for a given roulette number."""
+    if n == 0:
+        return "green"
+    if n in RED_NUMBERS:
+        return "red"
+    return "black"
+
