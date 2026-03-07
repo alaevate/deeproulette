@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <a href="https://github.com/alaevate/deeproulette"><img src="assets/logo.svg" alt="DeepRoulette" width="200"></a>
+  <a href="https://github.com/alaevate/deeproulette"><img src="assets/logo.png" alt="DeepRoulette" width="200"></a>
   <br>
   DeepRoulette
   <br>
