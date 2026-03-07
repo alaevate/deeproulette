@@ -1,9 +1,7 @@
 <h1 align="center">
-  <br>
   <a href="https://github.com/alaevate/deeproulette"><img src="assets/logo.png" alt="DeepRoulette" width="200"></a>
   <br>
   DeepRoulette
-  <br>
 </h1>
 
 <h4 align="center">LSTM-powered roulette predictor<br>real-time learning, 5 betting strategies, works with any table.</h4>
