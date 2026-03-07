@@ -24,12 +24,11 @@
 </p>
 
 <p align="center">
-  <a href="#-disclaimer">⚠️ Disclaimer</a> •
   <a href="#-quick-start--no-tech-knowledge-needed">🚀 Quick Start</a> •
   <a href="#-strategies">📊 Strategies</a> •
   <a href="#-project-structure">📁 Structure</a> •
   <a href="#-how-it-works">🧠 How It Works</a> •
-  <a href="#-advanced-settings">⚙️ Settings</a>
+  <a href="#%EF%B8%8F-advanced-settings">⚙️ Settings</a>
 </p>
 
 <p align="center">
