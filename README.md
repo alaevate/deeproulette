@@ -35,8 +35,6 @@
   <img src="assets/image.png" alt="DeepRoulette Demo">
 </p>
 
----
-
 ## ⚠️ Disclaimer
 
 > **This software is for educational and research purposes only.**
@@ -57,12 +55,12 @@
 
 ### Step 2 — Set up the project (one-time)
 
-Double-click **`SETUP.bat`** in the project folder.
+- Double-click **`SETUP.bat`** in the project folder.
 It will automatically install everything the program needs.
 
 ### Step 3 — Run the program
 
-Double-click **`START.bat`**.
+- Double-click **`START.bat`**.
 
 That's it! An interactive menu will guide you through everything — no typing of commands needed.
 
