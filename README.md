@@ -6,7 +6,7 @@
   <br>
 </h1>
 
-<h4 align="center">LSTM-powered roulette predictor — real-time learning, 5 betting strategies, works with any table.</h4>
+<h4 align="center">LSTM-powered roulette predictor<br>real-time learning, 5 betting strategies, works with any table.</h4>
 
 <p align="center">
   <a href="https://github.com/alaevate/deeproulette/issues">
