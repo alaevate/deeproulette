@@ -218,5 +218,5 @@ MIT License — see [LICENSE](LICENSE)
 
 ---
 
-<div align="center"><sub>Built with ❤️ by <a href="https://github.com/alaevate">alaevate</a></sub></div>
+<div align="center"><sub>Built with ❤️ by <a href="https://github.com/alaevate">Alaevate</a></sub></div>
 
