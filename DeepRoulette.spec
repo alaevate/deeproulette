@@ -7,8 +7,17 @@
 import sys
 from PyInstaller.utils.hooks import collect_all, collect_data_files
 
-# ── Version ───────────────────────────────────────────────────────────────────
+# ── Version & Platform ───────────────────────────────────────────────────────
 APP_VERSION = "2.0.0"
+
+if sys.platform.startswith("win"):
+    APP_OS = "windows"
+elif sys.platform.startswith("darwin"):
+    APP_OS = "macos"
+else:
+    APP_OS = "linux"
+
+APP_NAME = f"DeepRoulette-v{APP_VERSION}-{APP_OS}"
 
 # ── Collect TensorFlow / Keras (they have dynamic imports) ───────────────────
 tf_datas,    tf_binaries,    tf_hiddenimports    = collect_all("tensorflow")
@@ -99,7 +108,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name=f"DeepRoulette-v{APP_VERSION}",
+    name=APP_NAME,
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

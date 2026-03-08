@@ -10,13 +10,20 @@ cd "$(dirname "$0")/.." || exit 1
 
 set -e
 
+# Detect OS for output filename
+case "$(uname -s)" in
+    Darwin) APP_OS="macos" ;;
+    *)      APP_OS="linux" ;;
+esac
+OUT_NAME="DeepRoulette-v2.0.0-${APP_OS}"
+
 echo ""
 echo " ╔══════════════════════════════════════════════════════╗"
 echo " ║        DeepRoulette  —  Build Executable             ║"
 echo " ║   Packages everything into a single binary file      ║"
 echo " ╚══════════════════════════════════════════════════════╝"
 echo ""
-echo " This will create:  dist/DeepRoulette-v2.0.0"
+echo " This will create:  dist/${OUT_NAME}"
 echo ""
 echo " ⚠  The binary will be ~400-700 MB (TensorFlow is large)"
 echo " ⚠  Build time: 5–15 minutes depending on your machine"
@@ -66,7 +73,7 @@ echo ""
 echo " ════════════════════════════════════════════════════════"
 echo "  ✓  Build complete!"
 echo ""
-echo "  Your build is at:  dist/DeepRoulette-v2.0.0"
+echo "  Your build is at:  dist/${OUT_NAME}"
 echo ""
 echo "  Share just that ONE file — no Python needed!"
 echo " ════════════════════════════════════════════════════════"
