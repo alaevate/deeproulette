@@ -2,10 +2,13 @@
 # DeepRoulette.spec
 # ==================
 # PyInstaller build spec for DeepRoulette
-# Run via:  BUILD.bat  or  pyinstaller DeepRoulette.spec
+# Run via:  scripts/build.bat  or  pyinstaller DeepRoulette.spec
 
 import sys
 from PyInstaller.utils.hooks import collect_all, collect_data_files
+
+# ── Version ───────────────────────────────────────────────────────────────────
+APP_VERSION = "2.0.0"
 
 # ── Collect TensorFlow / Keras (they have dynamic imports) ───────────────────
 tf_datas,    tf_binaries,    tf_hiddenimports    = collect_all("tensorflow")
@@ -54,6 +57,10 @@ a = Analysis(
         "websockets",
         "numpy",
         "asyncio",
+        # Fix requests charset detection warning in EXE
+        "charset_normalizer",
+        "charset_normalizer.md__mypyc",
+        "chardet",
     ],
     hookspath=[],
     hooksconfig={},
@@ -83,7 +90,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name="DeepRoulette",
+    name=f"DeepRoulette-v{APP_VERSION}",
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

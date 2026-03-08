@@ -12,7 +12,7 @@ echo  ║    Packages everything into a single  .exe  file      ║
 echo  ╚══════════════════════════════════════════════════════╝
 echo.
 echo  This will create:
-echo    dist\DeepRoulette.exe
+echo    dist\DeepRoulette-v2.0.0.exe
 echo.
 echo  ⚠  The EXE will be ~400-700 MB (TensorFlow is large)
 echo  ⚠  Build time: 5–15 minutes depending on your PC
@@ -75,7 +75,7 @@ echo  ════════════════════════�
 echo   ✓  Build complete!
 echo.
 echo   Your executable is at:
-echo     dist\DeepRoulette.exe
+echo     dist\DeepRoulette-v2.0.0.exe
 echo.
 echo   Share just that ONE file — no Python needed!
 echo  ════════════════════════════════════════════════════════
