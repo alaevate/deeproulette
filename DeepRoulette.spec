@@ -14,10 +14,14 @@ APP_VERSION = "2.0.0"
 tf_datas,    tf_binaries,    tf_hiddenimports    = collect_all("tensorflow")
 keras_datas, keras_binaries, keras_hiddenimports = collect_all("keras")
 
+# ── Collect charset_normalizer + requests (fixes RequestsDependencyWarning) ──
+csn_datas,  csn_binaries,  csn_hiddenimports  = collect_all("charset_normalizer")
+req_datas,  req_binaries,  req_hiddenimports  = collect_all("requests")
+
 a = Analysis(
     ["main.py"],
     pathex=["."],
-    binaries=tf_binaries + keras_binaries,
+    binaries=tf_binaries + keras_binaries + csn_binaries + req_binaries,
     datas=[
         # Project config / assets
         ("config",     "config"),
@@ -25,6 +29,9 @@ a = Analysis(
         # TensorFlow & Keras bundled data
         *tf_datas,
         *keras_datas,
+        # charset_normalizer & requests bundled data
+        *csn_datas,
+        *req_datas,
     ],
     hiddenimports=[
         # TensorFlow / Keras
@@ -58,9 +65,8 @@ a = Analysis(
         "numpy",
         "asyncio",
         # Fix requests charset detection warning in EXE
-        "charset_normalizer",
-        "charset_normalizer.md__mypyc",
-        "chardet",
+        *csn_hiddenimports,
+        *req_hiddenimports,
     ],
     hookspath=[],
     hooksconfig={},
@@ -84,6 +90,9 @@ a = Analysis(
 
 pyz = PYZ(a.pure)
 
+# ── onefile mode — single portable EXE ───────────────────────────────────────
+# UPX is disabled: it corrupts python3xx.dll and causes
+# 'Failed to load Python DLL' at runtime on Windows.
 exe = EXE(
     pyz,
     a.scripts,
@@ -94,14 +103,14 @@ exe = EXE(
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
-    upx=True,          # compress with UPX if available (reduces size ~30%)
+    upx=False,             # ← must stay False — UPX breaks python DLL loading
     upx_exclude=[],
     runtime_tmpdir=None,
-    console=True,      # keep console window — needed for Rich terminal UI
+    console=True,          # keep console window — needed for Rich terminal UI
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon="assets/icon.ico" if __import__("os").path.exists("assets/icon.ico") else None,
+    icon="assets/logo.ico",
 )

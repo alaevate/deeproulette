@@ -14,7 +14,6 @@ SPEED_PRESETS = [
     ("Normal",   "1 spin every 5 seconds  (realistic)",   5.0),
     ("Fast",     "1 spin every 2 seconds",                2.0),
     ("Turbo",    "1 spin every 0.5 seconds",              0.5),
-    ("Max",      "No delay — as fast as possible",        0.0),
 ]
 
 # ── Roulette Number Colors ────────────────────────────────────────────────────
