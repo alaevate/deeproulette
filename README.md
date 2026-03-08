@@ -1,12 +1,10 @@
 <h1 align="center">
-  <br>
   <a href="https://github.com/alaevate/deeproulette"><img src="assets/logo.png" alt="DeepRoulette" width="200"></a>
   <br>
   DeepRoulette
-  <br>
 </h1>
 
-<h4 align="center">LSTM-powered roulette predictor — real-time learning, 5 betting strategies, works with any table.</h4>
+<h4 align="center">LSTM-powered roulette predictor<br>real-time learning, 5 betting strategies, works with any table.</h4>
 
 <p align="center">
   <a href="https://github.com/alaevate/deeproulette/issues">
@@ -35,8 +33,6 @@
   <img src="assets/image.png" alt="DeepRoulette Demo">
 </p>
 
----
-
 ## ⚠️ Disclaimer
 
 > **This software is for educational and research purposes only.**
@@ -57,12 +53,12 @@
 
 ### Step 2 — Set up the project (one-time)
 
-Double-click **`SETUP.bat`** in the project folder.
+- Double-click **`SETUP.bat`** in the project folder.
 It will automatically install everything the program needs.
 
 ### Step 3 — Run the program
 
-Double-click **`START.bat`**.
+- Double-click **`START.bat`**.
 
 That's it! An interactive menu will guide you through everything — no typing of commands needed.
 
