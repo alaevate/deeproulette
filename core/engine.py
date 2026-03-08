@@ -26,7 +26,13 @@ from config.settings        import (
     SEQUENCE_LENGTH, MAX_HISTORY, AUTO_TRAIN_MIN,
     CASINO_WS_URL, CASINO_ID, TABLE_ID, CURRENCY,
     OFFLINE_MODELS_DIR, ONLINE_MODELS_DIR,
+    TEST_MODE,
 )
+
+
+# Spin counts at which the test-mode session pauses to show stats
+# (only active when TEST_MODE = True in config/settings.py)
+SPIN_MILESTONES = (100, 250, 500, 1000) if TEST_MODE else ()
 
 
 class PredictionEngine:
@@ -74,6 +80,11 @@ class PredictionEngine:
         self.on_model_status   = None
         self.on_balance_empty  = None
         self.on_advice         = None   # manual mode: fired before each spin
+        self.on_milestone      = None   # test mode: fired at 100/250/500/1000 spins
+
+        # ── Test-mode state ──
+        self._feed             = None   # reference to active data feed
+        self.test_mode_complete = False  # True when all milestones are done
 
         # ── Neural network ──
         # Load from offline folder (trained weights); online updates save to online folder
@@ -172,12 +183,24 @@ class PredictionEngine:
                 "probabilities": probabilities,
             })
 
-        # ── 8. Balance check ─────────────────────────────────────────────────
+        # ── 8. Test-mode milestone checkpoint ────────────────────────────────
+        if (not self.use_live and not self.manual_mode
+                and self.tracker.total_spins in SPIN_MILESTONES):
+            if self.on_milestone:
+                self.on_milestone(self.tracker.total_spins)
+            if self.tracker.total_spins == SPIN_MILESTONES[-1]:
+                self.test_mode_complete = True
+                self._running = False
+                if self._feed is not None:
+                    self._feed.stop()
+                return
+
+        # ── 9. Balance check ─────────────────────────────────────────────
         if self.balance <= 0:
             self._running = False
             if self.on_balance_empty:
                 self.on_balance_empty()
-        # ── 9. Pre-compute next advice for live mode ───────────────────────
+        # ── 10. Pre-compute next advice for live mode ──────────────────────
         # Sim and manual show advice BEFORE the spin via on_before_spin.
         # Live mode has no before_spin hook, so advice is shown after each result
         # (which is immediately before the next spin arrives).
@@ -238,6 +261,7 @@ class PredictionEngine:
         else:
             from data.simulator import Simulator
             feed = Simulator(spin_interval=self.spin_interval)
+            self._feed = feed
             feed.on_before_spin(self.show_advice)
             feed.on_number(self.handle_spin)
             await feed.run()

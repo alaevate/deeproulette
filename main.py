@@ -46,6 +46,7 @@ from ui.display import (
     render_balance_empty,
     render_session_summary,
     render_bet_advice,
+    render_milestone_summary,
 )
 from core.engine     import PredictionEngine
 from config.settings import SAVED_MODELS_DIR, OFFLINE_MODELS_DIR, ONLINE_MODELS_DIR, LOGS_DIR, DATA_STORE_DIR
@@ -81,6 +82,12 @@ async def run_session(config: dict):
     engine.on_balance_empty = render_balance_empty
     engine.on_advice        = render_bet_advice
 
+    # Test-mode: pause at every milestone and show full stats
+    def _on_milestone(spin_count: int):
+        render_milestone_summary(spin_count, engine.tracker, strategy, balance)
+
+    engine.on_milestone = _on_milestone
+
     # Print session header
     render_session_header(strategy, balance, config["use_live"], config["auto_train"], config.get("manual_mode", False))
 
@@ -89,8 +96,9 @@ async def run_session(config: dict):
     except (asyncio.CancelledError, KeyboardInterrupt):
         pass
     finally:
-        # Always print the summary, even on Ctrl+C
-        render_session_summary(engine.tracker, strategy, balance)
+        # Skip the final summary if test-mode already printed it at the 1000-spin milestone
+        if not engine.test_mode_complete:
+            render_session_summary(engine.tracker, strategy, balance)
 
 
 # -- Entry point ---------------------------------------------------------------

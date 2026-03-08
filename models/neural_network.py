@@ -17,7 +17,7 @@ import os
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.models import Sequential, load_model
-from tensorflow.keras.layers import LSTM, Dense, Dropout
+from tensorflow.keras.layers import Input, LSTM, Dense, Dropout
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
 from tensorflow.keras.utils import to_categorical
@@ -49,8 +49,8 @@ class RouletteNeuralNetwork:
         model = Sequential(name="roulette_predictor")
 
         # ── Recurrent layers ──
+        model.add(Input(shape=(SEQUENCE_LENGTH, 1), name="input"))
         model.add(LSTM(LSTM_UNITS_1,
-                       input_shape=(SEQUENCE_LENGTH, 1),
                        return_sequences=True,
                        name="lstm_1"))
         model.add(Dropout(DROPOUT_RATE, name="drop_1"))

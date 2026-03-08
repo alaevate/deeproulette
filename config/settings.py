@@ -47,6 +47,9 @@ RECONNECT_DELAY  = 30      # Seconds to wait before WebSocket reconnect
 PING_INTERVAL    = 60      # Seconds between keepalive pings to the server
 SPIN_INTERVAL    = 5       # Seconds between spins in simulation mode (default)
 
+# ── Test Mode ─────────────────────────────────────────────────────────────────
+TEST_MODE = False # pauses at 100 / 250 / 500 / 1000 spins
+
 # ── Simulation Speed Presets ──────────────────────────────────────────────────
 # Each entry: (label, description, spin_interval_seconds)
 SPEED_PRESETS = [

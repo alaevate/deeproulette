@@ -198,6 +198,49 @@ def render_session_header(strategy, balance: float, use_live: bool, auto_train: 
     console.print()
 
 
+# ── Test-mode milestone checkpoint ───────────────────────────────────────────
+
+_MILESTONE_LIST = [100, 250, 500, 1000]
+
+def render_milestone_summary(spin_count: int, tracker, strategy, initial_balance: float):
+    """
+    Print a full checkpoint banner + session stats table at each milestone
+    (100 / 250 / 500 / 1000 spins)
+    After the final milestone the banner says 'All done'; otherwise it shows
+    the next target and waits to press Enter before continuing.
+    """
+    is_final = spin_count == _MILESTONE_LIST[-1]
+
+    console.print()
+    console.rule(
+        f"[bold yellow]🏁  CHECKPOINT — {spin_count} SPINS  🏁[/bold yellow]",
+        style="bold yellow",
+    )
+    console.print()
+
+    # Reuse the full session-summary table
+    render_session_summary(tracker, strategy, initial_balance)
+
+    if is_final:
+        console.print(Panel(
+            "[bold green]✅  All milestones completed  (100 → 250 → 500 → 1000)[/bold green]\n"
+            "[dim]📸  Screenshot your results above before closing.[/dim]",
+            border_style="green",
+            padding=(0, 2),
+        ))
+        console.print()
+    else:
+        next_ms = _MILESTONE_LIST[_MILESTONE_LIST.index(spin_count) + 1]
+        console.print(Panel(
+            f"[dim]📸  Take your screenshot now.[/dim]\n"
+            f"[dim]Next checkpoint: [/dim][bold cyan]{next_ms} spins[/bold cyan]",
+            border_style="yellow",
+            padding=(0, 2),
+        ))
+        console.input("  ▶  Press [bold]Enter[/bold] to continue to the next milestone...")
+        console.print()
+
+
 # ── Balance depleted ──────────────────────────────────────────────────────────
 
 def render_balance_empty():
