@@ -85,9 +85,9 @@ def show_welcome():
 
     logo.append("\n")
 
-    line1 = "Deep LSTM Neural Network  •  Real-Time Prediction"
+    line1 = "Deep LSTM Neural Network   •    Real-Time Prediction"
     line2 = "━" * 52
-    line3 = "v2.0  •  github.com/alaevate/deeproulette  •  2026"
+    line3 = "v2.0.0  •  github.com/alaevate/deeproulette  •  2026"
 
     logo.append(_centre(line1) + line1 + "\n", style="dim cyan")
     logo.append(_centre(line2) + line2 + "\n", style="cyan")
