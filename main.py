@@ -50,6 +50,7 @@ from ui.display import (
 )
 from core.engine     import PredictionEngine
 from config.settings import SAVED_MODELS_DIR, OFFLINE_MODELS_DIR, ONLINE_MODELS_DIR, LOGS_DIR, DATA_STORE_DIR
+from utils.updater   import check_for_updates
 
 
 # -- Folder setup --------------------------------------------------------------
@@ -105,6 +106,9 @@ async def run_session(config: dict):
 
 def main():
     ensure_directories()
+
+    # Check GitHub for a newer release
+    check_for_updates()
 
     # Run the interactive menu
     try:

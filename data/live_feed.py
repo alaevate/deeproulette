@@ -17,7 +17,8 @@ import logging
 import websockets
 from datetime import datetime
 
-from config.settings import RECONNECT_DELAY, PING_INTERVAL
+from config.settings import RECONNECT_DELAY
+from utils.constants import PING_INTERVAL
 
 
 class LiveFeed:

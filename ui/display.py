@@ -14,7 +14,7 @@ from rich.panel     import Panel
 from rich.text      import Text
 from rich           import box
 
-from config.settings import get_number_color
+from utils.constants import get_number_color
 
 console = Console()
 

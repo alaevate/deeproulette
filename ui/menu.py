@@ -22,7 +22,8 @@ from rich.columns  import Columns
 from rich          import box
 
 from strategies    import ALL_STRATEGIES
-from config.settings import DEFAULT_BALANCE, SPEED_PRESETS
+from config.settings  import DEFAULT_BALANCE
+from utils.constants  import SPEED_PRESETS
 
 console = Console()
 

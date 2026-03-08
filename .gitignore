@@ -38,6 +38,7 @@ Thumbs.db
 roulette_log.txt
 *.backup
 temp/
+RELEASES.md
 
 # PyInstaller build output
 build/

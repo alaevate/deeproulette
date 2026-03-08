@@ -13,7 +13,7 @@ import random
 import logging
 from datetime import datetime
 
-from config.settings import SPIN_INTERVAL, RED_NUMBERS, BLACK_NUMBERS
+from utils.constants import RED_NUMBERS, BLACK_NUMBERS, SPIN_INTERVAL
 
 
 class Simulator:
