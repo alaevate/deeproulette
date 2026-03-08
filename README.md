@@ -48,17 +48,25 @@
 
 1. Go to **https://www.python.org/downloads/**
 2. Download the latest Python 3 installer
-3. Run it and **tick the box** that says **"Add Python to PATH"**
-4. Click Install
+3. **Windows**: Run the installer and tick **"Add Python to PATH"**
+4. **Linux**: `sudo apt install python3 python3-pip`
+5. **macOS**: `brew install python` or download from python.org
 
 ### Step 2 — Set up the project (one-time)
 
-- Double-click **`SETUP.bat`** in the project folder.
-It will automatically install everything the program needs.
+| OS | Command |
+|---|---|
+| 🪟 Windows | Double-click **`scripts/install.bat`** |
+| 🐧 Linux | `bash scripts/install.sh` |
+| 🍎 macOS | `bash scripts/install.sh` |
 
 ### Step 3 — Run the program
 
-- Double-click **`START.bat`**.
+| OS | Command |
+|---|---|
+| 🪟 Windows | Double-click **`scripts/run.bat`** |
+| 🐧 Linux | `bash scripts/run.sh` |
+| 🍎 macOS | `bash scripts/run.sh` |
 
 That's it! An interactive menu will guide you through everything — no typing of commands needed.
 
@@ -85,10 +93,12 @@ Choose a strategy in the interactive menu. Each one tells the AI how many number
 ```
 DeepRoulette/
 │
-├── START.bat              ← Double-click to run the program
-├── SETUP.bat              ← Double-click ONCE to install everything
-├── main.py                ← Program entry point
-├── requirements.txt       ← Package list (used by SETUP.bat)
+├── scripts/
+│   ├── run.bat / run.sh       ← Run the program  (Windows / Linux+macOS)
+│   ├── install.bat / install.sh ← First-time setup (Windows / Linux+macOS)
+│   └── build.bat / build.sh   ← Build EXE/binary (Windows / Linux+macOS)
+├── main.py                    ← Program entry point
+├── requirements.txt           ← Package list (used by setup scripts)
 │
 ├── config/
 │   └── settings.py        ← All tunable settings in one place
@@ -99,7 +109,8 @@ DeepRoulette/
 │
 ├── data/
 │   ├── live_feed.py       ← Live WebSocket feed (Pragmatic Play / configurable)
-│   └── simulator.py       ← Local random spin generator
+│   ├── simulator.py       ← Local random spin generator
+│   └── manual_feed.py     ← Manual spin entry mode
 │
 ├── models/
 │   └── neural_network.py  ← LSTM architecture definition
@@ -118,7 +129,9 @@ DeepRoulette/
 │
 ├── utils/
 │   ├── logger.py          ← Session log files
-│   └── tracker.py         ← Win/loss statistics
+│   ├── tracker.py         ← Win/loss statistics
+│   ├── constants.py       ← Internal roulette constants
+│   └── updater.py         ← GitHub update checker
 │
 ├── saved_models/          ← AI model files saved here (.keras)
 ├── logs/                  ← Session log files saved here
@@ -175,9 +188,9 @@ All settings are in [`config/settings.py`](config/settings.py). Key values:
 | `SEQUENCE_LENGTH` | `15` | Past spins used as AI input |
 | `BET_FRACTION` | `0.02` | Fraction of balance bet per number |
 | `AUTO_TRAIN_MIN` | `30` | Min spins before online training starts |
-| `SPIN_INTERVAL` | `5` | Seconds between simulated spins |
 | `RECONNECT_DELAY` | `30` | Seconds before WebSocket reconnect |
 | `TRAINING_EPOCHS` | `100` | Epochs for full offline training |
+| `TEST_MODE` | `False` | Pause at 100/250/500/1000 spins to show stats |
 
 ---
 

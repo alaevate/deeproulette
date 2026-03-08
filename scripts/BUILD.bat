@@ -1,4 +1,5 @@
 @echo off
+cd /d "%~dp0.."
 title DeepRoulette — Build EXE
 color 0B
 cls

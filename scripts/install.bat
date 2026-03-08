@@ -1,4 +1,5 @@
 @echo off
+cd /d "%~dp0.."
 color 0A
 cls
 echo.
@@ -65,7 +66,7 @@ echo.
 echo  =====================================================
 echo    Setup Complete!
 echo.
-echo    To start the program, double-click START.bat
+echo    To start the program, double-click scripts\run.bat
 echo  =====================================================
 echo.
 pause
