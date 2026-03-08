@@ -44,7 +44,19 @@
 
 ## 🚀 Quick Start — No Tech Knowledge Needed
 
-### Step 1 — Install Python (one-time, skip if already installed)
+### ⚡ Option 1 — Download the EXE (Windows only, easiest)
+
+1. Go to **[Releases](https://github.com/alaevate/deeproulette/releases/latest)**
+2. Under **Assets**, download **`DeepRoulette-v2.0.0-windows.exe`**
+3. Run it — no Python, no setup, nothing to install
+
+> ⚠️ The file is ~400–700 MB because it bundles the full AI (TensorFlow) inside.
+
+---
+
+### 🛠️ Option 2 — Run from Source
+
+#### Step 1 — Install Python (one-time, skip if already installed)
 
 1. Go to **https://www.python.org/downloads/**
 2. Download the latest Python 3 installer
@@ -52,7 +64,7 @@
 4. **Linux**: `sudo apt install python3 python3-pip`
 5. **macOS**: `brew install python` or download from python.org
 
-### Step 2 — Set up the project (one-time)
+#### Step 2 — Set up the project (one-time)
 
 | OS | Command |
 |---|---|
@@ -60,7 +72,7 @@
 | 🐧 Linux | `bash scripts/install.sh` |
 | 🍎 macOS | `bash scripts/install.sh` |
 
-### Step 3 — Run the program
+#### Step 3 — Run the program
 
 | OS | Command |
 |---|---|
