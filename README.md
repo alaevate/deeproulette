@@ -100,58 +100,6 @@ Choose a strategy in the interactive menu. Each one tells the AI how many number
 
 ---
 
-## 📁 Project Structure
-
-```
-DeepRoulette/
-│
-├── scripts/
-│   ├── run.bat / run.sh       ← Run the program  (Windows / Linux+macOS)
-│   ├── install.bat / install.sh ← First-time setup (Windows / Linux+macOS)
-│   └── build.bat / build.sh   ← Build EXE/binary (Windows / Linux+macOS)
-├── main.py                    ← Program entry point
-├── requirements.txt           ← Package list (used by setup scripts)
-│
-├── config/
-│   └── settings.py        ← All tunable settings in one place
-│
-├── core/
-│   ├── engine.py          ← Main prediction loop
-│   └── trainer.py         ← Model training (offline & online)
-│
-├── data/
-│   ├── live_feed.py       ← Live WebSocket feed (Pragmatic Play / configurable)
-│   ├── simulator.py       ← Local random spin generator
-│   └── manual_feed.py     ← Manual spin entry mode
-│
-├── models/
-│   └── neural_network.py  ← LSTM architecture definition
-│
-├── strategies/
-│   ├── base.py            ← Shared betting logic
-│   ├── sniper.py          ← 1 number
-│   ├── aggressive.py      ← 3 numbers
-│   ├── balanced.py        ← 6 numbers
-│   ├── conservative.py    ← 18 numbers
-│   └── adaptive.py        ← AI-driven dynamic
-│
-├── ui/
-│   ├── menu.py            ← Interactive startup menu
-│   └── display.py         ← Colourful terminal output
-│
-├── utils/
-│   ├── logger.py          ← Session log files
-│   ├── tracker.py         ← Win/loss statistics
-│   ├── constants.py       ← Internal roulette constants
-│   └── updater.py         ← GitHub update checker
-│
-├── saved_models/          ← AI model files saved here (.keras)
-├── logs/                  ← Session log files saved here
-└── data_store/            ← Reserved for future data storage
-```
-
----
-
 ## 🧠 How It Works
 
 ```
