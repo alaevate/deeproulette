@@ -26,13 +26,13 @@ from config.settings        import (
     SEQUENCE_LENGTH, MAX_HISTORY, AUTO_TRAIN_MIN,
     CASINO_WS_URL, CASINO_ID, TABLE_ID, CURRENCY,
     OFFLINE_MODELS_DIR, ONLINE_MODELS_DIR,
-    TEST_MODE,
+    CHECKPOINT_MODE,
 )
 
 
-# Spin counts at which the test-mode session pauses to show stats
-# (only active when TEST_MODE = True in config/settings.py)
-SPIN_MILESTONES = (100, 250, 500, 1000) if TEST_MODE else ()
+# Spin counts at which checkpoint mode pauses to show stats
+# (only active when CHECKPOINT_MODE = True in config/settings.py)
+SPIN_MILESTONES = (100, 250, 500, 1000) if CHECKPOINT_MODE else ()
 
 
 class PredictionEngine:
@@ -80,11 +80,11 @@ class PredictionEngine:
         self.on_model_status   = None
         self.on_balance_empty  = None
         self.on_advice         = None   # manual mode: fired before each spin
-        self.on_milestone      = None   # test mode: fired at 100/250/500/1000 spins
+        self.on_milestone      = None   # checkpoint mode: fired at 100/250/500/1000 spins
 
-        # ── Test-mode state ──
-        self._feed             = None   # reference to active data feed
-        self.test_mode_complete = False  # True when all milestones are done
+        # ── Checkpoint mode state ──
+        self._feed                 = None   # reference to active data feed
+        self.checkpoint_mode_complete = False  # True when all milestones are done
 
         # ── Neural network ──
         # Load from offline folder (trained weights); online updates save to online folder
@@ -183,13 +183,13 @@ class PredictionEngine:
                 "probabilities": probabilities,
             })
 
-        # ── 8. Test-mode milestone checkpoint ────────────────────────────────
+        # ── 8. Checkpoint mode milestone ──────────────────────────────────────
         if (not self.use_live and not self.manual_mode
                 and self.tracker.total_spins in SPIN_MILESTONES):
             if self.on_milestone:
-                self.on_milestone(self.tracker.total_spins)
+                await self.on_milestone(self.tracker.total_spins)
             if self.tracker.total_spins == SPIN_MILESTONES[-1]:
-                self.test_mode_complete = True
+                self.checkpoint_mode_complete = True
                 self._running = False
                 if self._feed is not None:
                     self._feed.stop()

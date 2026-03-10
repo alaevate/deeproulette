@@ -198,7 +198,7 @@ def render_session_header(strategy, balance: float, use_live: bool, auto_train: 
     console.print()
 
 
-# ── Test-mode milestone checkpoint ───────────────────────────────────────────
+# ── Checkpoint mode ─────────────────────────────────────────────────────────
 
 _MILESTONE_LIST = [100, 250, 500, 1000]
 

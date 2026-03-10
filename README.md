@@ -150,7 +150,7 @@ All settings are in [`config/settings.py`](config/settings.py). Key values:
 | `AUTO_TRAIN_MIN` | `30` | Min spins before online training starts |
 | `RECONNECT_DELAY` | `30` | Seconds before WebSocket reconnect |
 | `TRAINING_EPOCHS` | `100` | Epochs for full offline training |
-| `TEST_MODE` | `False` | Pause at 100/250/500/1000 spins to show stats |
+| `CHECKPOINT_MODE` | `False` | Pause at 100/250/500/1000 spins to show stats |
 
 ---
 

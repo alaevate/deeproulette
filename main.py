@@ -83,9 +83,11 @@ async def run_session(config: dict):
     engine.on_balance_empty = render_balance_empty
     engine.on_advice        = render_bet_advice
 
-    # Test-mode: pause at every milestone and show full stats
-    def _on_milestone(spin_count: int):
-        render_milestone_summary(spin_count, engine.tracker, strategy, balance)
+    # Checkpoint mode: pause at every milestone and show full stats.
+    async def _on_milestone(spin_count: int):
+        await asyncio.to_thread(
+            render_milestone_summary, spin_count, engine.tracker, strategy, balance
+        )
 
     engine.on_milestone = _on_milestone
 
@@ -97,8 +99,8 @@ async def run_session(config: dict):
     except (asyncio.CancelledError, KeyboardInterrupt):
         pass
     finally:
-        # Skip the final summary if test-mode already printed it at the 1000-spin milestone
-        if not engine.test_mode_complete:
+        # Skip the final summary if checkpoint mode already printed it at the 1000-spin milestone
+        if not engine.checkpoint_mode_complete:
             render_session_summary(engine.tracker, strategy, balance)
 
 
