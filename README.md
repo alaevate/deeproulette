@@ -166,5 +166,10 @@ MIT License — see [LICENSE](LICENSE)
 
 ---
 
-<div align="center"><sub>Built with ❤️ by <a href="https://github.com/alaevate">Alaevate</a></sub></div>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/image?repos=alaevate/deeproulette&type=Date&theme=dark" width="100%" height="auto" />
+  <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/image?repos=alaevate/deeproulette&type=Date" width="100%" height="auto" />
+  <img alt="Star History Chart" src="https://api.star-history.com/image?repos=alaevate/deeproulette&type=Date" width="100%" height="auto" />
+</picture>
 
+<div align="center"><sub>Built with ❤️ by <a href="https://github.com/alaevate">Alaevate</a></sub></div>
