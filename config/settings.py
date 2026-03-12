@@ -39,7 +39,7 @@ MAX_HISTORY      = 2000    # Max spins kept in memory (sliding window)
 RECONNECT_DELAY  = 30      # Seconds to wait before WebSocket reconnect
 
 # ── Checkpoint Mode ─────────────────────────────────────────────────────────
-CHECKPOINT_MODE = True    # pauses at 100 / 250 / 500 / 1000 spins
+CHECKPOINT_MODE = False    # pauses at 100 / 250 / 500 / 1000 spins
 
 # ── File Paths ────────────────────────────────────────────────────────────────
 SAVED_MODELS_DIR        = "saved_models"          # Root models directory
