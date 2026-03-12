@@ -29,10 +29,10 @@ AUTO_TRAIN_MIN    = 30     # Minimum spins collected before online training begi
 AUTO_SAVE_EVERY   = 50     # Persist model to disk every N online updates
 
 # ── Betting ───────────────────────────────────────────────────────────────────
-DEFAULT_BALANCE = 100.0    # Default starting wallet
-MIN_BET         = 0.10     # Minimum bet per number
-BET_FRACTION    = 0.02     # Fraction of balance wagered per number each spin
-PAYOUT_RATIO    = 35       # Standard straight-up roulette payout (35 : 1)
+DEFAULT_BALANCE     = 100.0    # Default starting wallet
+DEFAULT_BET_AMOUNT  = 1.00     # Default bet amount per number (in dollars)
+MIN_BET             = 0.10     # Minimum bet per number
+PAYOUT_RATIO        = 35       # Standard straight-up roulette payout (35 : 1)
 
 # ── System ────────────────────────────────────────────────────────────────────
 MAX_HISTORY      = 2000    # Max spins kept in memory (sliding window)

@@ -9,7 +9,7 @@ Bet sizing and win/loss evaluation are handled here, shared by all strategies.
 
 from abc import ABC, abstractmethod
 import numpy as np
-from config.settings import MIN_BET, BET_FRACTION, PAYOUT_RATIO
+from config.settings import MIN_BET, PAYOUT_RATIO
 
 
 class BaseStrategy(ABC):
@@ -43,22 +43,28 @@ class BaseStrategy(ABC):
 
     # ── Shared logic (works for all strategies) ───────────────────────────────
 
-    def calculate_bets(self, numbers: list, balance: float) -> dict:
+    def calculate_bets(self, numbers: list, balance: float, bet_per_number: float = None) -> dict:
         """
-        Spread BET_FRACTION of the current balance equally across all chosen numbers.
-        Each number always receives at least MIN_BET.
+        Place a flat bet amount on each chosen number.
+        Each number receives the specified bet_per_number (defaults to $1.00).
+        Bet amount is always at least MIN_BET.
 
         Returns: { number: bet_amount, ... }
         """
         if not numbers:
             return {}
 
-        total_available = max(balance * BET_FRACTION, MIN_BET * len(numbers))
-        per_number      = total_available / len(numbers)
-        per_number      = max(per_number, MIN_BET)
-        # Round to nearest $0.10 so bets only change in $0.10 steps
-        per_number      = round(round(per_number / 0.10) * 0.10, 2)
-        per_number      = max(per_number, MIN_BET)
+        # Use provided bet amount or fall back to $1.00
+        if bet_per_number is None:
+            bet_per_number = 1.00
+        
+        # Enforce minimum bet
+        per_number = max(bet_per_number, MIN_BET)
+        
+        # Round to nearest $0.10 for cleaner display
+        per_number = round(round(per_number / 0.10) * 0.10, 2)
+        per_number = max(per_number, MIN_BET)
+        
         return {num: per_number for num in numbers}
 
     def evaluate_result(self, actual: int, predicted: list,

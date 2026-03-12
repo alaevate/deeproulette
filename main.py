@@ -71,6 +71,7 @@ async def run_session(config: dict):
     engine = PredictionEngine(
         strategy        = strategy,
         initial_balance = balance,
+        bet_per_number  = config.get("bet_per_number", 1.00),
         auto_train      = config["auto_train"],
         use_live        = config["use_live"],
         spin_interval   = config.get("spin_interval", 5.0),

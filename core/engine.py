@@ -51,6 +51,7 @@ class PredictionEngine:
         self,
         strategy:        BaseStrategy,
         initial_balance: float,
+        bet_per_number:  float = 1.00,
         auto_train:      bool  = False,
         use_live:        bool  = True,
         spin_interval:   float = 5.0,
@@ -59,6 +60,7 @@ class PredictionEngine:
         self.strategy        = strategy
         self.balance         = initial_balance
         self._init_balance   = initial_balance
+        self.bet_per_number  = bet_per_number
         self.auto_train      = auto_train
         self.use_live        = use_live
         self.spin_interval   = spin_interval
@@ -137,7 +139,7 @@ class PredictionEngine:
             input_tensor  = RouletteNeuralNetwork.build_prediction_input(self.history)
             probabilities = self.nn.model.predict(input_tensor, verbose=0)[0]
             predicted     = self.strategy.select_numbers(probabilities)
-            bets          = self.strategy.calculate_bets(predicted, self.balance)
+            bets          = self.strategy.calculate_bets(predicted, self.balance, self.bet_per_number)
 
         total_bet = sum(bets.values())
 
@@ -224,7 +226,7 @@ class PredictionEngine:
         input_tensor  = RouletteNeuralNetwork.build_prediction_input(self.history)
         probabilities = self.nn.model.predict(input_tensor, verbose=0)[0]
         predicted     = self.strategy.select_numbers(probabilities)
-        bets          = self.strategy.calculate_bets(predicted, self.balance)
+        bets          = self.strategy.calculate_bets(predicted, self.balance, self.bet_per_number)
 
         # Store so handle_spin can reuse without re-predicting
         self._pending_predicted = predicted

@@ -22,7 +22,7 @@ from rich.columns  import Columns
 from rich          import box
 
 from strategies    import ALL_STRATEGIES
-from config.settings  import DEFAULT_BALANCE
+from config.settings  import DEFAULT_BALANCE, DEFAULT_BET_AMOUNT
 from utils.constants  import SPEED_PRESETS
 
 console = Console()
@@ -180,12 +180,35 @@ def ask_balance() -> float:
     return balance
 
 
-# ── Step 3 — Data source ──────────────────────────────────────────────────────
+# ── Step 3 — Bet amount per number ───────────────────────────────────────────────────────────
+
+def ask_bet_amount() -> float:
+    """Prompt for the flat bet amount per number."""
+    console.print(Panel(
+        "[bold]Step 3 of 5  —  Bet Amount Per Number[/bold]\n\n"
+        "  How much do you want to bet on each predicted number?\n"
+        "  [dim]This is a flat dollar amount per number (not a percentage).[/dim]\n\n"
+        "  💡 Recommended: [bold]$0.50 – $5.00[/bold] for balanced risk.",
+        border_style="dim",
+        padding=(0, 2),
+    ))
+    console.print()
+
+    bet_amount = FloatPrompt.ask(
+        "[bold]Enter bet amount per number ($)[/bold]",
+        default=DEFAULT_BET_AMOUNT,
+    )
+    bet_amount = max(0.10, float(bet_amount))
+    console.print(f"\n  ✅ Bet amount set to: [bold yellow]${bet_amount:.2f}[/bold yellow] per number\n")
+    return bet_amount
+
+
+# ── Step 4 — Data source ──────────────────────────────────────────────────────
 
 def ask_mode() -> tuple:
     """Ask whether to use live casino, simulation, or manual entry."""
     console.print(Panel(
-        "[bold]Step 3 of 4  —  Data Source[/bold]\n\n"
+        "[bold]Step 4 of 5  —  Data Source[/bold]\n\n"
         "  [bold cyan][1] Live Mode[/bold cyan]\n"
         "      Connects to a real Pragmatic Play casino WebSocket.\n"
         "      [dim]Real spins, real-time. Requires internet connection.[/dim]\n\n"
@@ -254,7 +277,7 @@ def ask_sim_speed() -> float:
 def ask_auto_train() -> bool:
     """Ask whether to enable online model updates during the session."""
     console.print(Panel(
-        "[bold]Step 4 of 4  —  AI Auto-Training[/bold]\n\n"
+        "[bold]Step 5 of 5  —  AI Auto-Training[/bold]\n\n"
         "  When enabled, the AI will learn from each new spin in real time,\n"
         "  gradually improving its predictions as the session continues.\n\n"
         "  [dim]This uses slightly more CPU but produces a smarter model over time.\n"
@@ -275,7 +298,7 @@ def ask_auto_train() -> bool:
 
 # ── Confirmation screen ───────────────────────────────────────────────────────
 
-def show_confirmation(strategy_cls, balance: float, use_live: bool, auto_train: bool, spin_interval: float = 5.0, manual_mode: bool = False):
+def show_confirmation(strategy_cls, balance: float, bet_amount: float, use_live: bool, auto_train: bool, spin_interval: float = 5.0, manual_mode: bool = False):
     """Display a summary of all chosen settings before launching."""
     s          = strategy_cls()
     risk_color = _RISK_COLOUR.get(s.RISK_LEVEL, "white")
@@ -299,6 +322,7 @@ def show_confirmation(strategy_cls, balance: float, use_live: bool, auto_train: 
         f"  Strategy   :  [bold]{s.STRATEGY_NAME}[/bold]\n"
         f"  Risk Level :  [{risk_color}]{s.RISK_LEVEL}[/{risk_color}]\n"
         f"  Balance    :  [bold yellow]${balance:.2f}[/bold yellow]\n"
+        f"  Bet/Number :  [bold yellow]${bet_amount:.2f}[/bold yellow]\n"
         f"  Mode       :  {mode_label}{speed_line}\n"
         f"  Auto-Train :  {train_label}",
         title="[bold cyan]Ready to Start[/bold cyan]",
@@ -319,6 +343,7 @@ def run_menu() -> dict:
         {
           "strategy_cls": <class>,
           "balance":      float,
+          "bet_per_number": float,
           "use_live":     bool,
           "auto_train":   bool,
         }
@@ -327,17 +352,19 @@ def run_menu() -> dict:
 
     strategy_cls          = ask_strategy()
     balance               = ask_balance()
+    bet_amount            = ask_bet_amount()
     use_live, manual_mode = ask_mode()
     spin_interval         = 5.0 if (use_live or manual_mode) else ask_sim_speed()
     auto_train            = ask_auto_train()
 
-    show_confirmation(strategy_cls, balance, use_live, auto_train, spin_interval, manual_mode)
+    show_confirmation(strategy_cls, balance, bet_amount, use_live, auto_train, spin_interval, manual_mode)
 
     return {
-        "strategy_cls":  strategy_cls,
-        "balance":       balance,
-        "use_live":      use_live,
-        "manual_mode":   manual_mode,
-        "auto_train":    auto_train,
-        "spin_interval": spin_interval,
+        "strategy_cls":   strategy_cls,
+        "balance":        balance,
+        "bet_per_number": bet_amount,
+        "use_live":       use_live,
+        "manual_mode":    manual_mode,
+        "auto_train":     auto_train,
+        "spin_interval":  spin_interval,
     }

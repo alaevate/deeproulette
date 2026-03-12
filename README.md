@@ -146,7 +146,7 @@ All settings are in [`config/settings.py`](config/settings.py). Key values:
 | Setting | Default | What it controls |
 |---|---|---|
 | `SEQUENCE_LENGTH` | `15` | Past spins used as AI input |
-| `BET_FRACTION` | `0.02` | Fraction of balance bet per number |
+| `DEFAULT_BET_AMOUNT` | `1.00` | Default bet amount per number (in dollars) |
 | `AUTO_TRAIN_MIN` | `30` | Min spins before online training starts |
 | `RECONNECT_DELAY` | `30` | Seconds before WebSocket reconnect |
 | `TRAINING_EPOCHS` | `100` | Epochs for full offline training |
