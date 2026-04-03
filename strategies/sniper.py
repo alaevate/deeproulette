@@ -1,3 +1,5 @@
+# Copyright 2026 alaevate
+# Licensed under the Apache License, Version 2.0
 """Sniper — single number straight-up bet."""
 
 import numpy as np

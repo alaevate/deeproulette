@@ -1,3 +1,5 @@
+# Copyright 2026 alaevate
+# Licensed under the Apache License, Version 2.0
 """Legacy scroll-based display — used only for manual mode (stdin blocks alt-screen)."""
 
 from rich.console import Console

@@ -1,3 +1,5 @@
+## Copyright 2026 alaevate
+# Licensed under the Apache License, Version 2.0
 """Hybrid — combines inside straight-up bets with outside category bets."""
 
 import numpy as np

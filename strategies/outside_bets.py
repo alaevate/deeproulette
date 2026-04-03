@@ -1,3 +1,5 @@
+## Copyright 2026 alaevate
+# Licensed under the Apache License, Version 2.0
 """Outside-bet strategies (color, parity, range, dozen, column)."""
 
 import numpy as np

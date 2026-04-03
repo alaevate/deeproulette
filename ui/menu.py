@@ -1,3 +1,5 @@
+# Copyright 2026 alaevate
+# Licensed under the Apache License, Version 2.0
 """Interactive startup menu — guided strategy & session configuration."""
 
 from rich.console import Console

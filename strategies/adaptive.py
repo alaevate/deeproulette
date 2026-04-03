@@ -1,3 +1,5 @@
+# Copyright 2026 alaevate
+# Licensed under the Apache License, Version 2.0
 """Adaptive AI — dynamically picks 1-6 numbers based on model confidence."""
 
 import numpy as np

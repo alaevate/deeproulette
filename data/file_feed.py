@@ -1,3 +1,5 @@
+# Copyright 2026 alaevate
+# Licensed under the Apache License, Version 2.0
 """File-based training feed — reads roulette numbers from .txt files for batch training."""
 
 import os

@@ -1,3 +1,5 @@
+# Copyright 2026 alaevate
+# Licensed under the Apache License, Version 2.0
 """Local roulette simulator — generates random spins for offline testing."""
 
 import asyncio

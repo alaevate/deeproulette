@@ -1,3 +1,5 @@
+## Copyright 2026 alaevate
+# Licensed under the Apache License, Version 2.0
 """Conservative color betting strategy (red/black)."""
 
 import numpy as np

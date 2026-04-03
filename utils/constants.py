@@ -1,3 +1,5 @@
+# Copyright 2026 alaevate
+# Licensed under the Apache License, Version 2.0
 """Internal roulette constants."""
 
 SPIN_INTERVAL = 5      # seconds between spins in simulation mode

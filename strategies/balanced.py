@@ -1,3 +1,5 @@
+# Copyright 2026 alaevate
+# Licensed under the Apache License, Version 2.0
 """Balanced — top 6 straight-up bets."""
 
 import numpy as np

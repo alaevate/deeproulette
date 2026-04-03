@@ -1,3 +1,5 @@
+# Copyright 2026 alaevate
+# Licensed under the Apache License, Version 2.0
 """Model trainer — full offline training and online incremental updates."""
 
 import logging

@@ -1,3 +1,5 @@
+## Copyright 2026 alaevate
+# Licensed under the Apache License, Version 2.0
 """Fusion — combines 1 to 5 outside bets based on AI probability analysis."""
 
 import numpy as np

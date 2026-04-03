@@ -1,3 +1,5 @@
+# Copyright 2026 alaevate
+# Licensed under the Apache License, Version 2.0
 """Checks GitHub Releases for a newer version of DeepRoulette."""
 
 import urllib.request

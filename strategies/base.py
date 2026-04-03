@@ -1,3 +1,5 @@
+# Copyright 2026 alaevate
+# Licensed under the Apache License, Version 2.0
 """Abstract base class for all betting strategies."""
 
 from abc import ABC, abstractmethod
