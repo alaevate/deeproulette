@@ -1,1 +1,1 @@
-# config package
+"""Application configuration."""

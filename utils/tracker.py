@@ -1,8 +1,4 @@
-"""
-utils/tracker.py
-================
-Statistics tracker — records every spin and computes live performance metrics.
-"""
+"""Statistics tracker — records every spin and computes live performance metrics."""
 
 from datetime import datetime
 
@@ -13,25 +9,21 @@ class StatsTracker:
     def __init__(self):
         self.reset()
 
-    # ── Reset ─────────────────────────────────────────────────────────────────
-
     def reset(self):
-        self.total_spins   = 0
-        self.total_wins    = 0
-        self.total_losses  = 0
+        self.total_spins = 0
+        self.total_wins = 0
+        self.total_losses = 0
         self.total_wagered = 0.0
-        self.total_profit  = 0.0    # positive = profit, negative = loss
-        self.history       = []     # list of spin dicts
+        self.total_profit = 0.0
+        self.history = []
         self.session_start = datetime.now()
-
-    # ── Record a spin ─────────────────────────────────────────────────────────
 
     def record(self, number: int, predicted: list, bets: dict,
                is_win: bool, net: float, balance: float):
         """Add one spin to the session history."""
-        self.total_spins   += 1
+        self.total_spins += 1
         self.total_wagered += sum(bets.values())
-        self.total_profit  += net
+        self.total_profit += net
 
         if is_win:
             self.total_wins   += 1
@@ -46,8 +38,6 @@ class StatsTracker:
             "net":       net,
             "balance":   balance,
         })
-
-    # ── Computed properties ───────────────────────────────────────────────────
 
     @property
     def win_rate(self) -> float:
@@ -68,10 +58,7 @@ class StatsTracker:
         return self.history[-1]["balance"] if self.history else 0.0
 
     def streak(self) -> tuple:
-        """
-        Returns the current win/loss streak as (kind, length).
-        kind is 'W' for a win streak or 'L' for a loss streak.
-        """
+        """Current streak as (kind, length) where kind is 'W' or 'L'."""
         if not self.history:
             return "N", 0
         kind  = "W" if self.history[-1]["is_win"] else "L"

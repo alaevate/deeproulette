@@ -4,7 +4,7 @@
   DeepRoulette
 </h1>
 
-<h4 align="center">LSTM-powered roulette predictor<br>real-time learning, 5 betting strategies, works with any table.</h4>
+<h4 align="center">Transformer + BiLSTM roulette predictor<br>real-time learning, inside & outside bets, works with any table.</h4>
 
 <p align="center">
   <a href="https://github.com/alaevate/deeproulette/issues">
@@ -47,7 +47,7 @@
 ### ⚡ Option 1 — Download the EXE (Windows only, easiest)
 
 1. Go to **[Releases](https://github.com/alaevate/deeproulette/releases/latest)**
-2. Under **Assets**, download **`DeepRoulette-v2.0.0-windows.exe`**
+2. Under **Assets**, download **`DeepRoulette-v2.0-windows.exe`**
 3. Run it — no Python, no setup, nothing to install
 
 > ⚠️ The file is ~400–700 MB because it bundles the full AI (TensorFlow) inside.
@@ -86,17 +86,35 @@ That's it! An interactive menu will guide you through everything — no typing o
 
 ## 📊 Strategies
 
-Choose a strategy in the interactive menu. Each one tells the AI how many numbers to bet on per spin:
+Choose a strategy in the interactive menu. Strategies are split into three categories:
 
-| Strategy | Numbers Bet | Win Chance | Risk | Best For |
+### Inside Bets (Straight-up 35:1)
+
+| Strategy | Numbers | Win Chance | Risk | Best For |
 |---|---|---|---|---|
 | 🎯 **Sniper** | 1 | ~2.7% | Extreme | Thrill seekers — huge payouts, rare wins |
 | 🔥 **Aggressive** | 3 | ~8.1% | High | Confident sessions with strong AI training |
 | ⚖️ **Balanced** | 6 | ~16.2% | Medium | **Recommended starting point** |
-| 🛡️ **Conservative** | 18 | ~48.6% | Low | Beginners — most consistent results |
-| 🤖 **Adaptive AI** | 1–18 | Varies | Variable | Let the AI decide based on its own confidence |
 
-> **Not sure which to pick?** Start with **Balanced** or **Conservative**.
+### Outside Bets
+
+| Strategy | Bet | Win Chance | Payout | Best For |
+|---|---|---|---|---|
+| 🔴⚫ **Red/Black** | 1 bet | ~48.6% | 1:1 | Simple color prediction |
+| 🔢 **Odd/Even** | 1 bet | ~48.6% | 1:1 | Parity-based betting |
+| 📏 **Small/Big** | 1 bet | ~48.6% | 1:1 | Range-based betting (1-18 or 19-36) |
+| 🧩 **Dozens** | 1 bet | ~32.4% | 2:1 | Best of 3 dozens (1-12, 13-24, 25-36) |
+| 📊 **Columns** | 1 bet | ~32.4% | 2:1 | Best of 3 table columns |
+
+### AI-Powered
+
+| Strategy | Bets | Win Chance | Risk | Best For |
+|---|---|---|---|---|
+| 🤖 **Adaptive AI** | 1-6 | Varies | Variable | AI reads its own confidence, adjusts coverage |
+| 🧠 **Fusion** | 1-5 bets | Varies | Variable | Combines up to 5 outside bets using AI analysis |
+| 🎲 **Hybrid** | Mixed | Varies | Variable | Inside numbers + outside bets combined |
+
+> **Not sure which to pick?** Start with **Balanced** or **Red/Black**.
 
 ---
 
@@ -113,12 +131,12 @@ Choose a strategy in the interactive menu. Each one tells the AI how many number
        │
        ├── [History buffer]  Collects the last 15 spin results
        │
-       ├── [Neural Network]  3-layer LSTM → outputs a probability
+      ├── [Neural Network]  Hybrid Transformer + BiLSTM → outputs a probability
        │                     for each of the 37 possible numbers
        │
        ├── [Strategy]        Picks the top N numbers by probability
        │
-       ├── [Betting]         Sizes bets as 2% of balance per number
+      ├── [Betting]         Supports straight-up and outside-bet payout logic
        │
        ├── [Accounting]      Win: +35× the winning bet − all bets
        │                     Loss: −all bets
@@ -131,11 +149,12 @@ Choose a strategy in the interactive menu. Each one tells the AI how many number
 
 ### The AI Model
 
-- **Architecture**: 3 stacked LSTM layers (256 → 128 → 64 units), followed by 2 Dense layers
-- **Input**: The last 15 spin results, normalised to [0, 1]
-- **Output**: A probability distribution over all 37 numbers (0–36)
-- **Training**: Categorical cross-entropy loss, Adam optimiser, early stopping
-- **Online learning**: Optional — the model updates after every spin using the most recent 150 results
+- **Architecture**: Transformer attention block + bidirectional LSTM stack + dense head
+- **Input**: Last 15 spins with engineered features (number, color, parity, range, dozen, column)
+- **Output**: Probability distribution over all 37 numbers (0–36)
+- **Training**: Label-smoothed categorical cross-entropy, Adam optimizer, early stopping
+- **Online learning**: Optional — model updates after every spin using recent 150 results
+- **Model storage**: Separate directories per mode — `saved_models/manual/`, `saved_models/simulation/`, `saved_models/live/`
 
 ---
 
@@ -147,10 +166,10 @@ All settings are in [`config/settings.py`](config/settings.py). Key values:
 |---|---|---|
 | `SEQUENCE_LENGTH` | `15` | Past spins used as AI input |
 | `DEFAULT_BET_AMOUNT` | `1.00` | Default bet amount per number (in dollars) |
-| `AUTO_TRAIN_MIN` | `30` | Min spins before online training starts |
+| `AUTO_TRAIN_MIN` | `20` | Min spins before online training starts |
 | `RECONNECT_DELAY` | `30` | Seconds before WebSocket reconnect |
-| `TRAINING_EPOCHS` | `100` | Epochs for full offline training |
-| `CHECKPOINT_MODE` | `False` | Pause at 100/250/500/1000 spins to show stats |
+| `TRAINING_EPOCHS` | `150` | Epochs for full offline training |
+| `CHECKPOINT_MODE` | `True` | Pause at 100/250/500/1000 spins to show stats |
 
 ---
 

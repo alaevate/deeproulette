@@ -1,1 +1,1 @@
-# core package
+"""Core engine and model training logic."""

@@ -1,8 +1,4 @@
-"""
-utils/logger.py
-===============
-Centralised logging — one log file per session, written to logs/
-"""
+"""Centralised logging — one log file per session."""
 
 import logging
 import os
@@ -11,10 +7,7 @@ from config.settings import LOGS_DIR
 
 
 def setup_logger(name: str = "DeepRoulette") -> logging.Logger:
-    """
-    Create (or reuse) a named logger.
-    Logs are written to  logs/session_YYYYMMDD_HHMMSS.log
-    """
+    """Create (or reuse) a named logger that writes to logs/session_<timestamp>.log."""
     os.makedirs(LOGS_DIR, exist_ok=True)
 
     logger = logging.getLogger(name)

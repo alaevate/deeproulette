@@ -1,12 +1,4 @@
-"""
-data/simulator.py
-=================
-Local roulette simulator — generates random spin results without any
-internet connection.
-
-Produces the exact same callback interface as LiveFeed so the rest of
-the system works identically in both live and simulated modes.
-"""
+"""Local roulette simulator — generates random spins for offline testing."""
 
 import asyncio
 import random
@@ -17,18 +9,15 @@ from utils.constants import RED_NUMBERS, BLACK_NUMBERS, SPIN_INTERVAL
 
 
 class Simulator:
-    """
-    Generates random roulette numbers (0–36) at a configurable rate.
-    Register a callback with  on_number(async_fn)  to receive each spin.
-    """
+    """Generates random roulette numbers (0–36) at a configurable rate."""
 
     def __init__(self, spin_interval: float = SPIN_INTERVAL):
-        self.spin_interval   = spin_interval
-        self.running         = False
-        self._callbacks      = []
+        self.spin_interval = spin_interval
+        self.running = False
+        self._callbacks = []
         self._before_callbacks = []
-        self._log            = logging.getLogger("Simulator")
-        self._spin_count     = 0
+        self._log = logging.getLogger("Simulator")
+        self._spin_count = 0
 
     def on_number(self, callback):
         """Register an async function to receive each simulated spin."""
@@ -39,34 +28,22 @@ class Simulator:
         self._before_callbacks.append(callback)
 
     async def run(self):
-        """
-        Start generating spins.  Runs until  stop()  is called or the task
-        is cancelled.
-
-        Order per iteration:
-          1. Call before_spin callbacks  (AI shows advice)
-          2. Sleep spin_interval         (user reads and places bets)
-          3. Generate number             (wheel spins)
-          4. Call number callbacks       (engine evaluates + shows result)
-        """
+        """Spin loop: before_callbacks → sleep → generate number → callbacks."""
         self.running     = True
         self._spin_count = 0
         self._log.info("Simulator started.")
 
         try:
             while self.running:
-                # ── 1. Show AI bet advice ────────────────────────────
                 for cb in self._before_callbacks:
                     await cb()
 
-                # ── 2. Pause (user reads advice / places bets) ──────────
                 if self.spin_interval > 0:
                     await asyncio.sleep(self.spin_interval)
 
                 if not self.running:
                     break
 
-                # ── 3. Generate result ──────────────────────────────
                 number = random.randint(0, 36)
                 self._spin_count += 1
                 self._log.debug(
@@ -74,7 +51,6 @@ class Simulator:
                     f"({self._get_color(number)})"
                 )
 
-                # ── 4. Dispatch to engine ────────────────────────────
                 for cb in self._callbacks:
                     await cb(number)
 
@@ -88,7 +64,6 @@ class Simulator:
         """Signal the simulator to stop after the current spin."""
         self.running = False
 
-    # ── Helpers ───────────────────────────────────────────────────────────────
 
     @staticmethod
     def _get_color(number: int) -> str:

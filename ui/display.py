@@ -1,44 +1,28 @@
-"""
-ui/display.py
-=============
-Rich-powered terminal display — renders every spin result and the
-final session summary.
+"""Legacy scroll-based display — used only for manual mode (stdin blocks alt-screen)."""
 
-All functions accept plain Python dicts / objects so they stay decoupled
-from the engine and strategy internals.
-"""
-
-from rich.console   import Console
-from rich.table     import Table
-from rich.panel     import Panel
-from rich.text      import Text
-from rich           import box
+from rich.console import Console
+from rich.table import Table
+from rich.panel import Panel
+from rich.text import Text
+from rich import box
 
 from utils.constants import get_number_color
 
 console = Console()
-
-# ── Colour mappings ───────────────────────────────────────────────────────────
 _NUMBER_EMOJI  = {"red": "🔴", "black": "⚫", "green": "🟢"}
 _RISK_COLOUR   = {
     "Extreme":  "red",
     "High":     "orange1",
     "Medium":   "yellow",
     "Low":      "green",
+    "Very Low": "bright_green",
     "Variable": "cyan",
 }
 
 
-# ── Individual spin output ────────────────────────────────────────────────────
 
 def render_spin(spin_data: dict):
-    """
-    Print a compact, colour-coded summary for one spin to the console.
-
-    spin_data keys (all provided by PredictionEngine.handle_spin):
-        number, predicted, bets, total_bet, is_win, net,
-        balance, win_rate, roi, spin_num, streak, model_saved
-    """
+    """Print a compact, colour-coded summary for one spin."""
     n         = spin_data["number"]
     predicted = spin_data["predicted"]
     total_bet = spin_data["total_bet"]
@@ -50,6 +34,7 @@ def render_spin(spin_data: dict):
     spin_num  = spin_data["spin_num"]
     streak_k, streak_v = spin_data["streak"]
     saved     = spin_data.get("model_saved", False)
+    bet_label = spin_data.get("bet_label")
 
     color   = get_number_color(n)
     emoji   = _NUMBER_EMOJI[color]
@@ -66,12 +51,7 @@ def render_spin(spin_data: dict):
     # ROI colour
     roi_color = "green" if roi >= 0 else "red"
 
-    # Predicted numbers (truncate long lists)
-    pred_display = ", ".join(str(p) for p in predicted[:8])
-    if len(predicted) > 8:
-        pred_display += f"  (+{len(predicted) - 8} more)"
-
-    # Result separator — makes it visually clear this is the outcome
+    # Result separator
     console.rule(
         f"[dim]Spin #{spin_num}  ◄ RESULT ►[/dim]",
         style="dim",
@@ -87,15 +67,19 @@ def render_spin(spin_data: dict):
         f"  │  Streak: {streak_badge}"
     )
 
-    # Prediction hit indicator (bets were already shown before spin in render_bet_advice)
+    # Prediction hit indicator
     hit     = n in predicted
     hit_str = "[bold green]✓ Hit![/bold green]" if hit else "[dim]✕ Miss[/dim]"
     saved_tag = "  [dim]💾 saved[/dim]" if saved else ""
-    console.print(f"  🔮 AI predicted: [dim]{pred_display}[/dim]  │  {hit_str}{saved_tag}")
+    if bet_label:
+        console.print(f"  🔮 AI picked: [bold cyan]{bet_label}[/bold cyan]  │  {hit_str}{saved_tag}")
+    else:
+        pred_display = ", ".join(str(p) for p in predicted[:8])
+        if len(predicted) > 8:
+            pred_display += f"  (+{len(predicted) - 8} more)"
+        console.print(f"  🔮 AI predicted: [dim]{pred_display}[/dim]  │  {hit_str}{saved_tag}")
     console.print()
 
-
-# ── Waiting message ───────────────────────────────────────────────────────────
 
 def render_waiting(current: int, needed: int):
     """Display a progress message while the history buffer is filling up."""
@@ -106,22 +90,28 @@ def render_waiting(current: int, needed: int):
     )
 
 
-# ── Manual mode bet advice ────────────────────────────────────────────────────
-
 def render_bet_advice(advice: dict):
-    """
-    Print the AI bet advice table BEFORE the spin result is revealed.
-    Called for ALL modes (manual, simulation, live) before each spin.
-    The table stretches to fill the terminal width with a small margin.
-    """
+    """Print the AI bet advice before the spin result is revealed."""
     predicted     = advice["predicted"]
     bets          = advice["bets"]
     balance       = advice["balance"]
     probabilities = advice.get("probabilities")
     spin_num      = advice.get("spin_num", "?")
+    bet_label     = advice.get("bet_label")
     total_bet     = sum(bets.values())
 
-    # ── Dynamic width: terminal width minus margins ───────────────────────────
+    # Compact display for labelled outside / fusion / hybrid bets
+    if bet_label:
+        console.print()
+        console.rule(f"[bold cyan]🎯  AI Bet Advice  —  Spin #{spin_num}[/bold cyan]", style="cyan")
+        console.print(
+            f"  🎲  Bet: [bold cyan]{bet_label}[/bold cyan]"
+            f"  │  Amount: [bold yellow]${total_bet:.2f}[/bold yellow]"
+            f"  │  Balance after: [yellow]${balance - total_bet:.2f}[/yellow]"
+        )
+        console.print()
+        return
+
     MARGIN        = 6          # columns to leave on each side
     term_width    = console.width or 120
     table_width   = max(60, term_width - MARGIN * 2)
@@ -169,10 +159,6 @@ def render_bet_advice(advice: dict):
         f"{pad}💰  Total bet: [bold yellow]${total_bet:.2f}[/bold yellow]"
         f"  │  Balance after bet: [yellow]${balance - total_bet:.2f}[/yellow]"
     )
-
-
-# ── Session header ────────────────────────────────────────────────────────────
-
 def render_session_header(strategy, balance: float, use_live: bool, auto_train: bool, manual_mode: bool = False):
     """Print a header panel when the session starts."""
     if manual_mode:
@@ -196,10 +182,6 @@ def render_session_header(strategy, balance: float, use_live: bool, auto_train: 
         padding=(0, 2),
     ))
     console.print()
-
-
-# ── Checkpoint mode ─────────────────────────────────────────────────────────
-
 _MILESTONE_LIST = [100, 250, 500, 1000]
 
 def render_milestone_summary(spin_count: int, tracker, strategy, initial_balance: float):
@@ -239,20 +221,12 @@ def render_milestone_summary(spin_count: int, tracker, strategy, initial_balance
         ))
         console.input("  ▶  Press [bold]Enter[/bold] to continue to the next milestone...")
         console.print()
-
-
-# ── Balance depleted ──────────────────────────────────────────────────────────
-
 def render_balance_empty():
     console.print()
     console.print(Panel(
         "[bold red]⚠  Balance depleted — session ended automatically.[/bold red]",
         border_style="red",
     ))
-
-
-# ── Session summary ───────────────────────────────────────────────────────────
-
 def render_session_summary(tracker, strategy, initial_balance: float):
     """Print a formatted table summarising the completed session."""
     console.print()

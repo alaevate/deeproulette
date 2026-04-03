@@ -1,29 +1,17 @@
-"""
-ui/menu.py
-==========
-Interactive startup menu — fully guided, no command-line knowledge needed.
+"""Interactive startup menu — guided strategy & session configuration."""
 
-Walks the user through:
-  1. Welcome screen
-  2. Strategy selection
-  3. Starting balance
-  4. Data mode (live / simulation)
-  5. Auto-train toggle
-  6. Confirmation & launch
-"""
+from rich.console import Console
+from rich.panel import Panel
+from rich.table import Table
+from rich.prompt import Prompt, Confirm, FloatPrompt
+from rich.text import Text
+from rich.align import Align
+from rich.columns import Columns
+from rich import box
 
-from rich.console  import Console
-from rich.panel    import Panel
-from rich.table    import Table
-from rich.prompt   import Prompt, Confirm, FloatPrompt
-from rich.text     import Text
-from rich.align    import Align
-from rich.columns  import Columns
-from rich          import box
-
-from strategies    import ALL_STRATEGIES
-from config.settings  import DEFAULT_BALANCE, DEFAULT_BET_AMOUNT
-from utils.constants  import SPEED_PRESETS
+from strategies import ALL_STRATEGIES, INSIDE_STRATEGIES, OUTSIDE_STRATEGIES, AI_STRATEGIES
+from config.settings import DEFAULT_BALANCE, DEFAULT_BET_AMOUNT
+from utils.constants import SPEED_PRESETS
 
 console = Console()
 
@@ -32,12 +20,9 @@ _RISK_COLOUR = {
     "High":     "orange1",
     "Medium":   "yellow",
     "Low":      "green",
+    "Very Low": "bright_green",
     "Variable": "cyan",
 }
-
-
-# ── Welcome screen ────────────────────────────────────────────────────────────
-
 # "DEEP" block — 32 chars wide
 _LOGO_DEEP = [
     ("██████╗ ███████╗███████╗██████╗ ", "bold cyan"),
@@ -85,9 +70,9 @@ def show_welcome():
 
     logo.append("\n")
 
-    line1 = "Deep LSTM Neural Network   •    Real-Time Prediction"
+    line1 = "Transformer + BiLSTM Neural Network  •  Real-Time Prediction"
     line2 = "━" * 52
-    line3 = "v2.0.0  •  github.com/alaevate/deeproulette  •  2026"
+    line3 = "v2.0  •  github.com/alaevate/deeproulette  •  2026"
 
     logo.append(_centre(line1) + line1 + "\n", style="dim cyan")
     logo.append(_centre(line2) + line2 + "\n", style="cyan")
@@ -101,41 +86,44 @@ def show_welcome():
         expand=True,
     ))
     console.print()
-
-
-# ── Step 1 — Strategy selection ───────────────────────────────────────────────
-
 def ask_strategy() -> type:
-    """Show strategy table and return the chosen strategy class."""
+    """Show categorised strategy table and return the chosen strategy class."""
     table = Table(
-        title="[bold]Step 1 of 4  —  Choose Your Strategy[/bold]",
+        title="[bold]Step 1 of 5  —  Choose Your Strategy[/bold]",
         box=box.ROUNDED,
         border_style="cyan",
         show_header=True,
         header_style="bold cyan",
         padding=(0, 1),
     )
-    table.add_column("#",            width=1,  justify="center")
+    table.add_column("#",            width=3,  justify="center")
     table.add_column("Strategy",     width=22)
     table.add_column("Risk Level",   width=12, justify="center")
     table.add_column("Numbers Bet",  width=12, justify="center")
     table.add_column("Win Chance",   width=12, justify="center")
     table.add_column("Description",  min_width=40)
 
-    for i, cls in enumerate(ALL_STRATEGIES, 1):
-        s          = cls()
-        risk_color = _RISK_COLOUR.get(s.RISK_LEVEL, "white")
-        nums       = str(s.NUMBERS_TO_BET) if s.NUMBERS_TO_BET > 0 else "1–18"
-        chance     = f"{s.TARGET_WIN_RATE:.1f}%" if s.TARGET_WIN_RATE > 0 else "Varies"
-
-        table.add_row(
-            str(i),
-            s.STRATEGY_NAME,
-            f"[{risk_color}]{s.RISK_LEVEL}[/{risk_color}]",
-            nums,
-            chance,
-            s.DESCRIPTION,
-        )
+    idx = 0
+    for label, group in [
+        ("🎯  Inside Bets (straight-up numbers)", INSIDE_STRATEGIES),
+        ("🎨  Outside Bets (red/black, odd/even …)", OUTSIDE_STRATEGIES),
+        ("🤖  AI Combo Strategies", AI_STRATEGIES),
+    ]:
+        table.add_row("", f"[bold underline]{label}[/bold underline]", "", "", "", "", end_section=True)
+        for cls in group:
+            idx += 1
+            s          = cls()
+            risk_color = _RISK_COLOUR.get(s.RISK_LEVEL, "white")
+            nums       = str(s.NUMBERS_TO_BET) if s.NUMBERS_TO_BET > 0 else "1–18"
+            chance     = f"{s.TARGET_WIN_RATE:.1f}%" if s.TARGET_WIN_RATE > 0 else "Varies"
+            table.add_row(
+                str(idx),
+                s.STRATEGY_NAME,
+                f"[{risk_color}]{s.RISK_LEVEL}[/{risk_color}]",
+                nums,
+                chance,
+                s.DESCRIPTION,
+            )
 
     console.print(table)
     console.print()
@@ -152,17 +140,15 @@ def ask_strategy() -> type:
     )
     selected = ALL_STRATEGIES[int(choice) - 1]
     console.print(
-        f"\n  ✅ Strategy selected: [bold cyan]{selected.STRATEGY_NAME}[/bold cyan]\n"
+        f"\n  ✅ Strategy selected: [bold cyan]{selected().STRATEGY_NAME}[/bold cyan]\n"
     )
     return selected
 
 
-# ── Step 2 — Starting balance ─────────────────────────────────────────────────
-
 def ask_balance() -> float:
     """Prompt for the starting virtual wallet size."""
     console.print(Panel(
-        "[bold]Step 2 of 4  —  Starting Balance[/bold]\n\n"
+        "[bold]Step 2 of 5  —  Starting Balance[/bold]\\n\\n"
         "  This is your virtual wallet for this session.\n"
         "  [dim]No real money is used — this is a simulation of betting.[/dim]\n\n"
         "  💡 Recommended: [bold]$50 – $500[/bold] to get meaningful statistics.",
@@ -179,8 +165,6 @@ def ask_balance() -> float:
     console.print(f"\n  ✅ Balance set to: [bold yellow]${balance:.2f}[/bold yellow]\n")
     return balance
 
-
-# ── Step 3 — Bet amount per number ───────────────────────────────────────────────────────────
 
 def ask_bet_amount() -> float:
     """Prompt for the flat bet amount per number."""
@@ -203,8 +187,6 @@ def ask_bet_amount() -> float:
     return bet_amount
 
 
-# ── Step 4 — Data source ──────────────────────────────────────────────────────
-
 def ask_mode() -> tuple:
     """Ask whether to use live casino, simulation, or manual entry."""
     console.print(Panel(
@@ -214,10 +196,13 @@ def ask_mode() -> tuple:
         "      [dim]Real spins, real-time. Requires internet connection.[/dim]\n\n"
         "  [bold yellow][2] Simulation Mode[/bold yellow]\n"
         "      Generates random spins locally on your computer.\n"
-        "      [dim]No internet needed. Great for collecting training data.[/dim]\n\n"
+        "      [dim]No internet needed. Great for testing strategies.[/dim]\n\n"
         "  [bold magenta][3] Manual Entry  ← Use AI advice at a real casino[/bold magenta]\n"
         "      You type each spin result — AI shows where to bet before each spin.\n"
-        "      [dim]Perfect for using the AI at a live or online casino.[/dim]",
+        "      [dim]Perfect for using the AI at a live or online casino.[/dim]\n\n"
+        "  [bold green][4] File Training  ← Train AI from real casino data[/bold green]\n"
+        "      Place .txt files with spin numbers in data_store/training_files/\n"
+        "      [dim]AI trains on each file and shows per-file accuracy results.[/dim]",
         border_style="dim",
         padding=(0, 2),
     ))
@@ -225,17 +210,21 @@ def ask_mode() -> tuple:
 
     choice = Prompt.ask(
         "[bold]Choose mode[/bold]",
-        choices=["1", "2", "3"],
+        choices=["1", "2", "3", "4"],
         default="3",
     )
     use_live    = (choice == "1")
     manual_mode = (choice == "3")
-    labels = {"1": "[cyan]Live Casino[/cyan]", "2": "[yellow]Simulation[/yellow]", "3": "[magenta]Manual Entry[/magenta]"}
+    file_train  = (choice == "4")
+    labels = {
+        "1": "[cyan]Live Casino[/cyan]",
+        "2": "[yellow]Simulation[/yellow]",
+        "3": "[magenta]Manual Entry[/magenta]",
+        "4": "[green]File Training[/green]",
+    }
     console.print(f"\n  ✅ Mode set to: {labels[choice]}\n")
-    return use_live, manual_mode
+    return use_live, manual_mode, file_train
 
-
-# ── Step 4 — Simulation speed (only in simulation mode) ──────────────────────
 
 def ask_sim_speed() -> float:
     """Let the user pick how fast the simulator generates spins."""
@@ -272,8 +261,6 @@ def ask_sim_speed() -> float:
     return interval
 
 
-# ── Step 5 — Auto-train ───────────────────────────────────────────────────────
-
 def ask_auto_train() -> bool:
     """Ask whether to enable online model updates during the session."""
     console.print(Panel(
@@ -295,8 +282,6 @@ def ask_auto_train() -> bool:
     console.print(f"\n  ✅ Auto-training: {label}\n")
     return enabled
 
-
-# ── Confirmation screen ───────────────────────────────────────────────────────
 
 def show_confirmation(strategy_cls, balance: float, bet_amount: float, use_live: bool, auto_train: bool, spin_interval: float = 5.0, manual_mode: bool = False):
     """Display a summary of all chosen settings before launching."""
@@ -333,8 +318,6 @@ def show_confirmation(strategy_cls, balance: float, bet_amount: float, use_live:
     Confirm.ask("[bold]Press Enter to launch[/bold]", default=True)
 
 
-# ── Full menu flow ────────────────────────────────────────────────────────────
-
 def run_menu() -> dict:
     """
     Run all menu steps and return a configuration dict.
@@ -350,10 +333,35 @@ def run_menu() -> dict:
     """
     show_welcome()
 
-    strategy_cls          = ask_strategy()
+    strategy_cls                       = ask_strategy()
+    use_live, manual_mode, file_train  = ask_mode()
+
+    if file_train:
+        # File training only needs the strategy — no balance/bet/speed prompts
+        console.print(Panel(
+            "[bold green]Ready to train![/bold green]\n\n"
+            f"  Strategy : [bold]{strategy_cls().STRATEGY_NAME}[/bold]\n"
+            "  Mode     : [green]File Training[/green]\n\n"
+            "  [dim]The AI will train on every .txt file in data_store/training_files/[/dim]",
+            title="[bold cyan]File Training[/bold cyan]",
+            border_style="green",
+            padding=(0, 2),
+        ))
+        console.print()
+        Confirm.ask("[bold]Press Enter to start training[/bold]", default=True)
+        return {
+            "strategy_cls":   strategy_cls,
+            "file_train":     True,
+            "balance":        0,
+            "bet_per_number": 0,
+            "use_live":       False,
+            "manual_mode":    False,
+            "auto_train":     False,
+            "spin_interval":  0,
+        }
+
     balance               = ask_balance()
     bet_amount            = ask_bet_amount()
-    use_live, manual_mode = ask_mode()
     spin_interval         = 5.0 if (use_live or manual_mode) else ask_sim_speed()
     auto_train            = ask_auto_train()
 
@@ -367,4 +375,5 @@ def run_menu() -> dict:
         "manual_mode":    manual_mode,
         "auto_train":     auto_train,
         "spin_interval":  spin_interval,
+        "file_train":     False,
     }

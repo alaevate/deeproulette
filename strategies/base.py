@@ -1,11 +1,4 @@
-"""
-strategies/base.py
-==================
-Abstract base class that every strategy must inherit from.
-
-Subclasses only need to implement `select_numbers()`.
-Bet sizing and win/loss evaluation are handled here, shared by all strategies.
-"""
+"""Abstract base class for all betting strategies."""
 
 from abc import ABC, abstractmethod
 import numpy as np
@@ -13,90 +6,53 @@ from config.settings import MIN_BET, PAYOUT_RATIO
 
 
 class BaseStrategy(ABC):
-    """
-    Contract for all prediction strategies.
 
-    Required override:
-        select_numbers(probabilities) → list[int]
-
-    Optional override:
-        calculate_bets(numbers, balance) → dict[int, float]
-    """
-
-    # ── Class-level metadata (override in each subclass) ──────────────────────
-    STRATEGY_NAME   = "Base Strategy"
-    RISK_LEVEL      = "Unknown"
-    NUMBERS_TO_BET  = 0
+    STRATEGY_NAME = "Base Strategy"
+    RISK_LEVEL = "Unknown"
+    NUMBERS_TO_BET = 0
     TARGET_WIN_RATE = 0.0
-    DESCRIPTION     = ""
-    MODEL_LABEL     = "base"   # used for saved model filename
-
-    # ── Abstract interface ────────────────────────────────────────────────────
+    DESCRIPTION = ""
+    MODEL_LABEL = "base"
 
     @abstractmethod
     def select_numbers(self, probabilities: np.ndarray) -> list:
-        """
-        Given the model's output probability array (shape: 37,),
-        return a list of integers (roulette numbers) to bet on.
-        """
+        """Return a list of roulette numbers to bet on given model probabilities."""
         ...
 
-    # ── Shared logic (works for all strategies) ───────────────────────────────
+    def get_display_label(self) -> str:
+        """Override in outside/combo strategies to return a label like 'RED' or 'RED + ODD'."""
+        return None
 
     def calculate_bets(self, numbers: list, balance: float, bet_per_number: float = None) -> dict:
-        """
-        Place a flat bet amount on each chosen number.
-        Each number receives the specified bet_per_number (defaults to $1.00).
-        Bet amount is always at least MIN_BET.
-
-        Returns: { number: bet_amount, ... }
-        """
+        """Place a flat bet on each chosen number."""
         if not numbers:
             return {}
-
-        # Use provided bet amount or fall back to $1.00
         if bet_per_number is None:
             bet_per_number = 1.00
-        
-        # Enforce minimum bet
         per_number = max(bet_per_number, MIN_BET)
-        
-        # Round to nearest $0.10 for cleaner display
         per_number = round(round(per_number / 0.10) * 0.10, 2)
         per_number = max(per_number, MIN_BET)
-        
         return {num: per_number for num in numbers}
 
-    def evaluate_result(self, actual: int, predicted: list,
-                        bets: dict, balance: float) -> tuple:
-        """
-        Determine whether the spin was a win or loss and compute the net change.
-
-        On a win:  net = bets[actual] × 35  −  total_bet
-        On a loss: net = −total_bet
-
-        Returns: (is_win: bool, net: float, new_balance: float)
-        """
+    def evaluate_result(self, actual: int, predicted: list, bets: dict, balance: float) -> tuple:
+        """Win pays 35:1 on the matched number (stake returned + 35× profit) minus total wagered."""
         total_bet = sum(bets.values())
         if actual in predicted:
-            winnings = bets[actual] * PAYOUT_RATIO
-            net      = winnings - total_bet
+            winnings = bets[actual] * (PAYOUT_RATIO + 1)   # 36 units back (35 profit + original bet)
+            net = winnings - total_bet
         else:
             net = -total_bet
-
         return (actual in predicted), round(net, 2), round(balance + net, 2)
 
     @property
     def model_filename(self) -> str:
-        """The saved model filename derived from the strategy label."""
         return f"{self.MODEL_LABEL}_model"
 
     def info(self) -> dict:
-        """Return a summary dict for display in the UI."""
         return {
-            "name":        self.STRATEGY_NAME,
-            "risk":        self.RISK_LEVEL,
-            "numbers":     self.NUMBERS_TO_BET,
-            "win_chance":  f"{self.TARGET_WIN_RATE:.1f}%",
+            "name": self.STRATEGY_NAME,
+            "risk": self.RISK_LEVEL,
+            "numbers": self.NUMBERS_TO_BET,
+            "win_chance": f"{self.TARGET_WIN_RATE:.1f}%",
             "description": self.DESCRIPTION,
         }

@@ -1,1 +1,1 @@
-# models package
+"""Neural network model definitions."""

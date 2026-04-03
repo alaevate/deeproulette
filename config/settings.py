@@ -1,49 +1,49 @@
-"""
-DeepRoulette — Central Configuration
-==========================================
-All settings live here. Change values to customize the system.
-"""
+"""DeepRoulette — Central Configuration."""
 
-# ── Casino WebSocket Connection ───────────────────────────────────────────────
+# Casino WebSocket Connection
 CASINO_WS_URL = "wss://dga.pragmaticplaylive.net/ws"
-CASINO_ID     = "ppcds00000003709"
-TABLE_ID      = "236"
-CURRENCY      = "USD"
+CASINO_ID = "ppcds00000003709"
+TABLE_ID = "236"
+CURRENCY = "USD"
 
-# ── Neural Network Architecture ───────────────────────────────────────────────
-SEQUENCE_LENGTH  = 15      # How many past spins the AI uses as input
-ROULETTE_NUMBERS = 37      # Possible outcomes: 0 through 36
+# Neural Network Architecture
+SEQUENCE_LENGTH = 15
+ROULETTE_NUMBERS = 37
 
-LSTM_UNITS_1  = 256        # First LSTM layer size  (bigger = smarter but slower)
-LSTM_UNITS_2  = 128        # Second LSTM layer size
-LSTM_UNITS_3  = 64         # Third LSTM layer size
-DENSE_UNITS   = 128        # Fully-connected hidden layer
-DROPOUT_RATE  = 0.25       # Regularization — prevents the model from memorizing noise
-LEARNING_RATE = 0.001      # How fast the model adjusts its weights
+LSTM_UNITS_1 = 256
+LSTM_UNITS_2 = 128
+LSTM_UNITS_3 = 64
+DENSE_UNITS = 128
+DROPOUT_RATE = 0.25
+LEARNING_RATE = 0.001
 
-# ── Training ──────────────────────────────────────────────────────────────────
-BATCH_SIZE        = 32     # Samples per training step
-TRAINING_EPOCHS   = 100    # Max epochs for a full offline training run
-ONLINE_EPOCHS     = 3      # Epochs used for per-spin online updates
-AUTO_TRAIN_MIN    = 30     # Minimum spins collected before online training begins
-AUTO_SAVE_EVERY   = 50     # Persist model to disk every N online updates
+# Training
+BATCH_SIZE = 16
+TRAINING_EPOCHS = 150
+ONLINE_EPOCHS = 5
+AUTO_TRAIN_MIN = 20
+AUTO_SAVE_EVERY = 30
+ONLINE_HISTORY_WINDOW = 150     # recent spins used per incremental update
 
-# ── Betting ───────────────────────────────────────────────────────────────────
-DEFAULT_BALANCE     = 100.0    # Default starting wallet
-DEFAULT_BET_AMOUNT  = 1.00     # Default bet amount per number (in dollars)
-MIN_BET             = 0.10     # Minimum bet per number
-PAYOUT_RATIO        = 35       # Standard straight-up roulette payout (35 : 1)
+# Betting
+DEFAULT_BALANCE = 100.0
+DEFAULT_BET_AMOUNT = 1.00
+MIN_BET = 0.10
+PAYOUT_RATIO = 35
 
-# ── System ────────────────────────────────────────────────────────────────────
-MAX_HISTORY      = 2000    # Max spins kept in memory (sliding window)
-RECONNECT_DELAY  = 30      # Seconds to wait before WebSocket reconnect
+# System
+MAX_HISTORY = 2000
+RECONNECT_DELAY = 30
 
-# ── Checkpoint Mode ─────────────────────────────────────────────────────────
-CHECKPOINT_MODE = False    # pauses at 100 / 250 / 500 / 1000 spins
+# Checkpoint Mode — pauses at 100/250/500/1000 spins for screenshot comparison
+CHECKPOINT_MODE = True
 
-# ── File Paths ────────────────────────────────────────────────────────────────
-SAVED_MODELS_DIR        = "saved_models"          # Root models directory
-OFFLINE_MODELS_DIR      = "saved_models/offline"  # Models trained offline (full dataset)
-ONLINE_MODELS_DIR       = "saved_models/online"   # Models updated online (per-spin incremental)
-LOGS_DIR                = "logs"                  # Where session logs are written
-DATA_STORE_DIR          = "data_store"            # Reserved for future dataset storage
+# File Paths
+SAVED_MODELS_DIR = "saved_models"
+REAL_MODELS_DIR = "saved_models/real"           # live + manual share one model (same wheel data)
+SIMULATION_MODELS_DIR = "saved_models/simulation"  # kept separate — uses random.randint, not real data
+LIVE_MODELS_DIR = REAL_MODELS_DIR               # alias — live now points to real
+MANUAL_MODELS_DIR = REAL_MODELS_DIR             # alias — manual now points to real
+LOGS_DIR = "logs"
+DATA_STORE_DIR = "data_store"
+TRAINING_FILES_DIR = "data_store/training_files"   # drop .txt files here for batch file-training

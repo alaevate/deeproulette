@@ -1,12 +1,4 @@
-"""
-utils/updater.py
-================
-Checks GitHub Releases for a newer version of DeepRoulette and prompts
-the user to visit the releases page if one is found.
-
-Uses only the Python standard library (urllib) — no extra dependencies.
-Fails silently if there is no internet connection or the request times out.
-"""
+"""Checks GitHub Releases for a newer version of DeepRoulette."""
 
 import urllib.request
 import urllib.error
@@ -18,9 +10,9 @@ from rich.panel   import Panel
 
 console = Console()
 
-_VERSION     = "2.0.0"
-_REPO        = "alaevate/deeproulette"
-_API_URL      = f"https://api.github.com/repos/{_REPO}/releases/latest"
+_VERSION = "2.0.0"
+_REPO = "alaevate/deeproulette"
+_API_URL = f"https://api.github.com/repos/{_REPO}/releases/latest"
 _RELEASES_URL = f"https://github.com/{_REPO}/releases/latest"
 
 def _parse_version(tag: str) -> tuple:
@@ -33,11 +25,7 @@ def _parse_version(tag: str) -> tuple:
 
 
 def check_for_updates() -> None:
-    """
-    Query the GitHub Releases API and, if a newer version exists,
-    show a Rich panel and ask the user whether to open the download page.
-    Silently skips on any network or parse error.
-    """
+    """Query GitHub Releases API for a newer version; prompt to open download page."""
     try:
         req = urllib.request.Request(
             _API_URL,
@@ -58,8 +46,6 @@ def check_for_updates() -> None:
                 f"  [dim green]✔  DeepRoulette v{_VERSION} is up to date.[/dim green]\n"
             )
             return
-
-        # ── New version available ─────────────────────────────────────────────
         console.print(Panel(
             f"  [bold yellow]🚀  New version available![/bold yellow]\n\n"
             f"  Installed : [dim]v{_VERSION}[/dim]\n"

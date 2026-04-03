@@ -39,6 +39,8 @@ roulette_log.txt
 *.backup
 temp/
 RELEASES.md
+ISSUE_TAGS.md
+/todo.md
 
 # PyInstaller build output
 build/

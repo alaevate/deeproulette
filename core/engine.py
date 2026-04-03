@@ -1,116 +1,92 @@
-"""
-core/engine.py
-==============
-Prediction Engine — the heart of DeepRoulette.
-
-Orchestrates the full pipeline for every roulette spin:
-  Data feed  →  History  →  AI prediction  →  Bet sizing
-  →  Win / Loss accounting  →  Stats update  →  UI callback
-  →  (optional) Online model update
-
-Usage:
-    engine = PredictionEngine(strategy, balance, auto_train, use_live)
-    engine.on_spin_complete = my_display_fn
-    await engine.run()
-"""
+"""Prediction Engine — orchestrates the full pipeline for every roulette spin."""
 
 import asyncio
 import logging
 
-from models.neural_network  import RouletteNeuralNetwork
-from strategies.base        import BaseStrategy
-from core.trainer           import ModelTrainer
-from utils.tracker          import StatsTracker
-from utils.logger           import setup_logger
-from config.settings        import (
+from models.neural_network import RouletteNeuralNetwork
+from strategies.base import BaseStrategy
+from core.trainer import ModelTrainer
+from utils.tracker import StatsTracker
+from utils.logger import setup_logger
+from config.settings import (
     SEQUENCE_LENGTH, MAX_HISTORY, AUTO_TRAIN_MIN,
     CASINO_WS_URL, CASINO_ID, TABLE_ID, CURRENCY,
-    OFFLINE_MODELS_DIR, ONLINE_MODELS_DIR,
+    MANUAL_MODELS_DIR, SIMULATION_MODELS_DIR, LIVE_MODELS_DIR,
     CHECKPOINT_MODE,
 )
 
 
-# Spin counts at which checkpoint mode pauses to show stats
-# (only active when CHECKPOINT_MODE = True in config/settings.py)
+# Checkpoint mode pauses at these spin counts to show stats
 SPIN_MILESTONES = (100, 250, 500, 1000) if CHECKPOINT_MODE else ()
 
 
 class PredictionEngine:
-    """
-    Central controller.  Works with any BaseStrategy subclass and any
-    data source (LiveFeed or Simulator).
-
-    UI hooks (all optional):
-        on_spin_complete(spin_data: dict)   — called after each evaluated spin
-        on_waiting(current, needed)         — called while history is being built
-        on_model_status(message: str)       — called when model loads / trains
-        on_balance_empty()                  — called when balance reaches zero
-    """
+    """Central controller — pairs any BaseStrategy with any data feed."""
 
     def __init__(
         self,
-        strategy:        BaseStrategy,
+        strategy: BaseStrategy,
         initial_balance: float,
-        bet_per_number:  float = 1.00,
-        auto_train:      bool  = False,
-        use_live:        bool  = True,
-        spin_interval:   float = 5.0,
-        manual_mode:     bool  = False,
+        bet_per_number: float = 1.00,
+        auto_train: bool = False,
+        use_live: bool = True,
+        spin_interval: float = 5.0,
+        manual_mode: bool = False,
     ):
-        self.strategy        = strategy
-        self.balance         = initial_balance
-        self._init_balance   = initial_balance
-        self.bet_per_number  = bet_per_number
-        self.auto_train      = auto_train
-        self.use_live        = use_live
-        self.spin_interval   = spin_interval
-        self.manual_mode     = manual_mode
+        self.strategy = strategy
+        self.balance = initial_balance
+        self._init_balance = initial_balance
+        self.bet_per_number = bet_per_number
+        self.auto_train = auto_train
+        self.use_live = use_live
+        self.spin_interval = spin_interval
+        self.manual_mode = manual_mode
 
-        self.history         = []
-        self.tracker         = StatsTracker()
-        self._log            = setup_logger()
-        self._running        = True
+        self.history = []
+        self.tracker = StatsTracker()
+        self._log = setup_logger()
+        self._running = True
 
-        # ── Pending state for manual mode (pre-computed advice) ──
         self._pending_predicted = None
-        self._pending_bets      = None
-        self._pending_probs     = None
+        self._pending_bets = None
+        self._pending_probs = None
 
-        # ── UI callbacks ──
-        self.on_spin_complete  = None
-        self.on_waiting        = None
-        self.on_model_status   = None
-        self.on_balance_empty  = None
-        self.on_advice         = None   # manual mode: fired before each spin
-        self.on_milestone      = None   # checkpoint mode: fired at 100/250/500/1000 spins
+        self.on_spin_complete = None
+        self.on_waiting = None
+        self.on_model_status = None
+        self.on_balance_empty = None
+        self.on_advice = None
+        self.on_milestone = None
 
-        # ── Checkpoint mode state ──
-        self._feed                 = None   # reference to active data feed
-        self.checkpoint_mode_complete = False  # True when all milestones are done
+        self._feed = None
+        self.checkpoint_mode_complete = False
 
-        # ── Neural network ──
-        # Load from offline folder (trained weights); online updates save to online folder
+        # Models are stored per operating mode to avoid cross-contamination
+        if manual_mode:
+            model_dir = MANUAL_MODELS_DIR
+        elif use_live:
+            model_dir = LIVE_MODELS_DIR
+        else:
+            model_dir = SIMULATION_MODELS_DIR
+
         self.nn = RouletteNeuralNetwork(
             model_name=strategy.model_filename,
-            save_dir=OFFLINE_MODELS_DIR,
+            save_dir=model_dir,
         )
         self.nn.load()
 
-        is_fresh = not self.nn.is_trained()
+        # Online trainer writes checkpoints — folder depends on live vs sim
+        self.trainer = ModelTrainer(self.nn, verbose=False, save_dir=model_dir)
+
+    def report_model_status(self):
+        """Fire the model-status callback (call AFTER wiring up callbacks)."""
         if self.on_model_status:
+            is_fresh = not self.nn.is_trained()
             status = "New untrained model created." if is_fresh else "Existing model loaded."
             self.on_model_status(status)
 
-        # Online trainer writes checkpoints — folder depends on live vs sim
-        self.trainer = ModelTrainer(self.nn, verbose=False, use_live=use_live)
-
-    # ── Spin handler ──────────────────────────────────────────────────────────
-
     async def handle_spin(self, number: int):
-        """
-        Called by the data feed for every new roulette number.
-        Full pipeline: record → predict → bet → evaluate → report
-        """
+        """Called by the data feed for every new roulette number."""
         if not self._running:
             return
 
@@ -126,38 +102,38 @@ class PredictionEngine:
                 self.on_waiting(len(self.history), SEQUENCE_LENGTH)
             return
 
-        # ── 1 & 2. Predict and size bets ────────────────────────────────────
+
         if self._pending_predicted is not None:
-            # Use the pre-spin advice already shown to the user (all non-live modes)
+            # Reuse prediction from show_advice() so the user sees the same numbers
             predicted               = self._pending_predicted
-            bets                    = self._pending_bets
-            probabilities           = self._pending_probs
+            bets = self._pending_bets
+            probabilities = self._pending_probs
             self._pending_predicted = None
-            self._pending_bets      = None
-            self._pending_probs     = None
+            self._pending_bets = None
+            self._pending_probs = None
         else:
-            input_tensor  = RouletteNeuralNetwork.build_prediction_input(self.history)
+            input_tensor = RouletteNeuralNetwork.build_prediction_input(self.history)
             probabilities = self.nn.model.predict(input_tensor, verbose=0)[0]
-            predicted     = self.strategy.select_numbers(probabilities)
-            bets          = self.strategy.calculate_bets(predicted, self.balance, self.bet_per_number)
+            predicted = self.strategy.select_numbers(probabilities)
+            bets = self.strategy.calculate_bets(predicted, self.balance, self.bet_per_number)
 
         total_bet = sum(bets.values())
 
-        # ── 3. Evaluate result ───────────────────────────────────────────────
+
         is_win, net, new_balance = self.strategy.evaluate_result(
             number, predicted, bets, self.balance
         )
         self.balance = new_balance
 
-        # ── 4. Record stats ──────────────────────────────────────────────────
+
         self.tracker.record(number, predicted, bets, is_win, net, self.balance)
 
-        # ── 5. Online training ───────────────────────────────────────────────
+
         model_saved = False
         if self.auto_train and len(self.history) >= AUTO_TRAIN_MIN:
             model_saved = self.trainer.train_online(self.history)
 
-        # ── 6. Log to file ───────────────────────────────────────────────────
+
         self._log.info(
             f"Spin {self.tracker.total_spins:>5} | "
             f"Result: {number:>2} | "
@@ -167,7 +143,6 @@ class PredictionEngine:
             f"ROI: {self.tracker.roi:>+6.1f}%"
         )
 
-        # ── 7. Notify UI ─────────────────────────────────────────────────────
         if self.on_spin_complete:
             self.on_spin_complete({
                 "number":        number,
@@ -183,9 +158,12 @@ class PredictionEngine:
                 "streak":        self.tracker.streak(),
                 "model_saved":   model_saved,
                 "probabilities": probabilities,
+                "bet_label":     self.strategy.get_display_label(),
+                "total_wins":    self.tracker.total_wins,
+                "total_losses":  self.tracker.total_losses,
             })
 
-        # ── 8. Checkpoint mode milestone ──────────────────────────────────────
+
         if (not self.use_live and not self.manual_mode
                 and self.tracker.total_spins in SPIN_MILESTONES):
             if self.on_milestone:
@@ -197,41 +175,38 @@ class PredictionEngine:
                     self._feed.stop()
                 return
 
-        # ── 9. Balance check ─────────────────────────────────────────────
         if self.balance <= 0:
             self._running = False
+            if self._feed is not None:
+                self._feed.stop()
             if self.on_balance_empty:
                 self.on_balance_empty()
-        # ── 10. Pre-compute next advice for live mode ──────────────────────
-        # Sim and manual show advice BEFORE the spin via on_before_spin.
-        # Live mode has no before_spin hook, so advice is shown after each result
-        # (which is immediately before the next spin arrives).
+            return
+        # Live mode: show advice after each result (before next spin)
         if self.use_live and self._running:
             await self.show_advice()
-    # ── Manual mode advice ────────────────────────────────────────────────────
+
 
     async def show_advice(self):
-        """
-        Called by ManualFeed before the user types the spin result.
-        Computes the AI recommendation and fires the on_advice callback.
-        """
+        """Compute AI recommendation and fire the on_advice callback."""
+        if not self._running:
+            return
         if len(self.history) < SEQUENCE_LENGTH:
             if self.on_waiting and not self.use_live:
                 self.on_waiting(len(self.history), SEQUENCE_LENGTH)
             self._pending_predicted = None
-            self._pending_bets      = None
-            self._pending_probs     = None
+            self._pending_bets = None
+            self._pending_probs = None
             return
 
-        input_tensor  = RouletteNeuralNetwork.build_prediction_input(self.history)
+        input_tensor = RouletteNeuralNetwork.build_prediction_input(self.history)
         probabilities = self.nn.model.predict(input_tensor, verbose=0)[0]
-        predicted     = self.strategy.select_numbers(probabilities)
-        bets          = self.strategy.calculate_bets(predicted, self.balance, self.bet_per_number)
+        predicted = self.strategy.select_numbers(probabilities)
+        bets = self.strategy.calculate_bets(predicted, self.balance, self.bet_per_number)
 
-        # Store so handle_spin can reuse without re-predicting
         self._pending_predicted = predicted
-        self._pending_bets      = bets
-        self._pending_probs     = probabilities
+        self._pending_bets = bets
+        self._pending_probs = probabilities
 
         if self.on_advice:
             self.on_advice({
@@ -240,24 +215,24 @@ class PredictionEngine:
                 "balance":       self.balance,
                 "probabilities": probabilities,
                 "spin_num":      self.tracker.total_spins + 1,
+                "bet_label":     self.strategy.get_display_label(),
             })
 
-    # ── Main run loop ─────────────────────────────────────────────────────────
-
     async def run(self):
-        """
-        Start the engine using the configured data source.
-        Runs until cancelled (Ctrl+C) or balance is depleted.
-        """
+        """Start the engine using the configured data source."""
+        self.report_model_status()
+
         if self.manual_mode:
             from data.manual_feed import ManualFeed
             feed = ManualFeed()
+            self._feed = feed
             feed.on_before_spin(self.show_advice)
             feed.on_number(self.handle_spin)
             await feed.run()
         elif self.use_live:
             from data.live_feed import LiveFeed
             feed = LiveFeed(CASINO_WS_URL, CASINO_ID, TABLE_ID, CURRENCY)
+            self._feed = feed
             feed.on_number(self.handle_spin)
             await feed.listen()
         else:

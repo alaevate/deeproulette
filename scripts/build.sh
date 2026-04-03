@@ -15,7 +15,7 @@ case "$(uname -s)" in
     Darwin) APP_OS="macos" ;;
     *)      APP_OS="linux" ;;
 esac
-OUT_NAME="DeepRoulette-v2.0.0-${APP_OS}"
+OUT_NAME="DeepRoulette-v2.0-${APP_OS}"
 
 echo ""
 echo " ╔══════════════════════════════════════════════════════╗"
