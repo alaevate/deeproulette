@@ -56,13 +56,15 @@
 
 ### 🛠️ Option 2 — Run from Source
 
-#### Step 1 — Install Python (one-time, skip if already installed)
+#### Step 1 — Install Python 3.10 (one-time, skip if already installed)
+
+> ⚠️ **Important:** For best compatibility with TensorFlow, use **Python 3.10** (not the latest version).
 
 1. Go to **https://www.python.org/downloads/**
-2. Download the latest Python 3 installer
+2. Download the Python 3.10 installer
 3. **Windows**: Run the installer and tick **"Add Python to PATH"**
-4. **Linux**: `sudo apt install python3 python3-pip`
-5. **macOS**: `brew install python` or download from python.org
+4. **Linux**: `sudo apt install python3.10 python3.10-venv python3-pip`
+5. **macOS**: Use `brew install python@3.10` or download from python.org
 
 #### Step 2 — Set up the project (one-time)
 
